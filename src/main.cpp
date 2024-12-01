@@ -2,11 +2,11 @@
 
 int main()
 {
-	Visualizer visualizer(1280, 720, "nbody");
+    Visualizer visualizer(1280, 720, "nbody");
 
-	if (visualizer.init()) {
-		visualizer.run();
-	}
+    if (visualizer.init()) {
+        visualizer.run();
+    }
 
-	return 0;
+    return 0;
 }

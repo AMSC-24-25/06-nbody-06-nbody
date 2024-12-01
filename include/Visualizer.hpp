@@ -8,33 +8,33 @@
 class Visualizer
 {
 public:
-	Visualizer(int window_width,
-			   int window_height,
-			   const std::string window_title) :
-		_window_width(window_width),
-		_window_height(window_height),
-		_window_title(window_title) {}
+    Visualizer(int window_width,
+               int window_height,
+               const std::string window_title) :
+        _window_width(window_width),
+        _window_height(window_height),
+        _window_title(window_title) {}
 
-	bool init();
-	void run();
-	void quit();
+    bool init();
+    void run();
+    void quit();
 
-	~Visualizer();
+    ~Visualizer();
 
 private:
-	bool _initSDL();
-	bool _initGL();
+    bool _initSDL();
+    bool _initGL();
 
-	void _handleEvents();
-	void _renderFrame();
+    void _handleEvents();
+    void _renderFrame();
 
-	bool _running = true;
+    bool _running = true;
 
-	// TODO: create separate Window class
-	SDL_Window *_window;
-	int _window_width;
-	int _window_height;
-	std::string _window_title;
+    // TODO: create separate Window class
+    SDL_Window *_window;
+    int _window_width;
+    int _window_height;
+    std::string _window_title;
 };
 
 #endif
