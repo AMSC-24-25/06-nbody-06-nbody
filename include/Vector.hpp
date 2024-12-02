@@ -15,14 +15,8 @@ public:
     static const Vector ZERO;
     // Constructor
     Vector() { comps.fill(0); }
-    Vector(const std::initializer_list<T> &init)
-    {
-        std::copy(init.begin(), init.end(), comps.begin());
-    }
-    Vector(const Vector &init)
-    {
-        std::copy(init.comps.begin(),init.comps.begin(),comps.begin());
-    }
+    Vector(const std::array<T,N> &init) : comps(init) {}
+    Vector(const Vector &init) : comps(init.comps) {}
 
     // Arithmetic operators
     inline friend Vector operator+(const Vector &lhs, const Vector &rhs)
