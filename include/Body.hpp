@@ -14,10 +14,10 @@ private:
     Vector<T, N> acc;
 
 public:
-    Body(const massT mass_init, const std::initializer_list<T> &pos_init, const std::initializer_list<T> &vel_init) : mass(mass_init),
+    Body(const massT &mass_init, const std::initializer_list<T> &pos_init, const std::initializer_list<T> &vel_init) : mass(mass_init),
                                                                                                                       pos(pos_init),
                                                                                                                       vel(vel_init) {}
-    Body(const massT mass_init, const Vector<T, N> pos_init, const Vector<T, N> vel_init) : mass(mass_init),
+    Body(const massT &mass_init, const Vector<T, N> &pos_init, const Vector<T, N> &vel_init) : mass(mass_init),
                                                                                             pos(pos_init),
                                                                                             vel(vel_init) {}
 
@@ -46,9 +46,19 @@ public:
         pos += deltaPos;
     }
 
+    void setPosition(const Vector<T, N> &newPos)
+    {
+        pos = newPos;
+    }
+
     void updateVelocity(const Vector<T, N> &deltaVel)
     {
         vel += deltaVel;
+    }
+
+    void setVelocity(const Vector<T, N> &newVel)
+    {
+        vel = newVel;
     }
 
     void updateAcceleration(const Vector<T, N> &deltaAcc)
@@ -56,19 +66,18 @@ public:
         acc += deltaAcc;
     }
 
+    void setAcceleration(const Vector<T, N> &newAcc)
+    {
+        acc = newAcc;
+    }
+
     // Stream operators
     inline friend std::ostream &operator<<(std::ostream &os, const Body &body)
     {
-        os << "Body:\n"
-           << "m: "
-           << body.getMass()
-           << "\ns: "
-           << body.getPosition()
-           << "\nv: "
-           << body.getVelocity()
-           << "\na: "
-           << body.getAcceleration()
-           << "\n";
+        os << body.getMass() << " "
+           << body.getPosition() << " "
+           << body.getVelocity() << " "
+           << body.getAcceleration();
 
         return os;
     }
