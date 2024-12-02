@@ -46,7 +46,7 @@ void NbodySolver::step()
     {
         for (int q = 0; q < bodies.size(); q++)
         {
-            bodies[q].setAcceleration(1 / bodies[q].getMass() * forces[q]);
+            bodies[q].setAcceleration(1.0 / bodies[q].getMass() * forces[q]);
         }
     }
 }
@@ -60,6 +60,6 @@ void NbodySolver::output()
 {
     for (int i = 0; i < bodies.size(); i++)
     {
-        std::cout << bodies[i] << std::endl;
+        std::cout << bodies[i].getPosition() << std::endl;
     }
 }
