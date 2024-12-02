@@ -6,10 +6,10 @@ using namespace std;
 int main(int argc, char **argv)
 {
     //1D SOLVER
-    const double deltaT = 1e-5;
+    const double deltaT = 100;
     const double numBodies = 2;
-    const double T = 10;
-    const unsigned int outputFreq = 1;
+    const double T = 4e5;
+    const unsigned int outputFreq = 5;
 
     NbodySolver solver(numBodies,deltaT);
 
