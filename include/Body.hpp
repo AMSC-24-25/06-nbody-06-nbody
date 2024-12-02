@@ -41,6 +41,21 @@ public:
         return acc;
     }
 
+    void updatePosition(const Vector<T, N> &deltaPos)
+    {
+        pos += deltaPos;
+    }
+
+    void updateVelocity(const Vector<T, N> &deltaVel)
+    {
+        vel += deltaVel;
+    }
+
+    void updateAcceleration(const Vector<T, N> &deltaAcc)
+    {
+        acc += deltaAcc;
+    }
+
     // Stream operators
     inline friend std::ostream &operator<<(std::ostream &os, const Body &body)
     {
