@@ -3,13 +3,16 @@
 #include <iostream>
 #include <array>
 #include <cassert>
+#include <cstdlib>
+#include <cmath>
 
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
 
 #include "ShaderProgram.hpp"
 
-	
+constexpr unsigned int N = 5;
+
 bool Renderer::init()
 {
     return _initialized = _init() && _loadShaders();
@@ -22,10 +25,73 @@ void Renderer::run()
     _allocBuffers();
     _setupScene();
 
+    // Quick and dirty simulation to test rendering (BAD CODE FOLLOWS)
+
+    std::array<std::array<float, 4>, N> pos; // pos[i][3] holds mass
+    std::array<std::array<float, 2>, N> vel;
+    std::array<std::array<float, 2>, N> forces;
+    const float dt = 1e-4;
+
+    for (unsigned int i = 0; i < N; ++i) {
+        pos[i][0] = (rand() % 800 - 400) / 500.0;
+        pos[i][1] = (rand() % 800 - 400) / 500.0;
+        pos[i][2] = 0.0;
+        pos[i][3] = 1.0f;
+        // Setting intial velocity to be
+        // perpendicular to position
+        float vx = -pos[i][1];
+        float vy = pos[i][0];
+        float mag = sqrt(vx * vx + vy * vy);
+        vel[i][0] = vx / mag * 100;
+        vel[i][1] = vy / mag * 100;
+    }
+
+    pos[0][0] = 0.0f;
+    pos[0][1] = 0.0f;
+    vel[0][0] = 0.0f;
+    vel[0][1] = 0.0f;
+    pos[0][3] = 500.0f;
+    pos[1][3] = 2.0f;
+
     while (_running) {
         _handleEvents();
 
-        // Step simulation here
+        for (unsigned int i = 0; i < N; ++i) {
+
+            forces[i][0] = 0.0;
+            forces[i][1] = 0.0;
+
+            for (unsigned int j = 0; j < N; ++j) {
+                if (i == j) continue;
+
+                float dist_x = pos[j][0] - pos[i][0];
+                float dist_y = pos[j][1] - pos[i][1];
+
+                float dist = sqrt(dist_x * dist_x + dist_y * dist_y) + 1e-12;
+                float rad_x = dist_x / dist;
+                float rad_y = dist_y / dist;
+
+                forces[i][0] += 100.0 * pos[i][3] * pos[j][3] /
+                    dist * dist * rad_x;
+                forces[i][1] += 100.0 * pos[i][3] * pos[j][3] /
+                    dist * dist * rad_y;
+            }
+        }
+
+        for (unsigned int i = 0; i < N; ++i) {
+            // Backwards euler
+            vel[i][0] += forces[i][0] / pos[i][3] * dt;
+            vel[i][1] += forces[i][1] / pos[i][3] * dt;
+
+            pos[i][0] += vel[i][0] * dt;
+            pos[i][1] += vel[i][1] * dt;
+        }
+
+        // Copying updated positions to GPU memory.
+        glBufferData(GL_SHADER_STORAGE_BUFFER,
+                     sizeof(pos),
+                     pos.data(),
+                     GL_DYNAMIC_DRAW);
 
         _renderFrame();
     }
@@ -99,6 +165,7 @@ bool Renderer::_loadShaders()
 }
 
 // Allocates OpenGL buffers to draw a quadrilateral
+// and to store particles positions
 void Renderer::_allocBuffers()
 {
     // Vertices and indices used to draw a quad.
@@ -142,8 +209,29 @@ void Renderer::_allocBuffers()
                  sizeof(quad_indices),
                  quad_indices.data(),
                  GL_STATIC_DRAW);
-}
 
+    // Sample particles data
+    /*
+    const std::array<float, 12>
+    particles_data = {
+         0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.0f, 1.0f,
+         0.0f,  0.5f, 0.0f, 1.0f,
+    };
+    */
+
+    // Creating a Shader Storage Buffer Object to store particles data.
+    glGenBuffers(1, &_particles_ssbo);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, _particles_ssbo);
+    // Copying particles data to GPU memory.
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, _particles_ssbo);
+    /*
+    glBufferData(GL_SHADER_STORAGE_BUFFER,
+                 sizeof(particles_data),
+                 particles_data.data(),
+                 GL_DYNAMIC_DRAW);
+    */
+}
 
 // Sets OpenGL rendering options, arranges the scene
 void Renderer::_setupScene()
@@ -152,7 +240,10 @@ void Renderer::_setupScene()
     // respect to the window coordinates
     glViewport(0, 0, _window_width, _window_height);
     // Sets clear color
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+    // Enabling transparency
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 
@@ -179,7 +270,7 @@ void Renderer::_renderFrame()
 
     glClear(GL_COLOR_BUFFER_BIT);
     // glBindVertexArray(_quad_vao);
-    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, 100);
+    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, N);
 
     SDL_GL_SwapWindow(_window);
 }
