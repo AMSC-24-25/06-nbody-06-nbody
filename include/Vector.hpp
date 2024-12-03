@@ -18,6 +18,14 @@ public:
     Vector() { comps.fill(0); }
     Vector(const std::array<T,N> &init) : comps(init) {}
     Vector(const Vector &init) : comps(init.comps) {}
+    // Constructor that takes initializer_list
+    Vector(const std::initializer_list<T>& init) {
+        if (init.size() != N) {
+            throw std::invalid_argument("Initializer list size must match vector dimension");
+        }
+        std::copy(init.begin(), init.end(), comps.begin());
+    }
+
 
     // // Constructor to initialize a Vector
     // Vector(const std::initializer_list<T>& init) {
