@@ -14,13 +14,10 @@ void NbodySolver::step()
         // TODO: THIS IS THE PART THAT CAN BE PARALLELIZED
         for (int q = 0; q < bodies.size(); q++)
         {
-            for (int p = 0; p < bodies.size(); p++)
+            for (int p = q + 1; p < bodies.size(); p++)
             {
-                if (p != q)
-                {
-                    forces[q] += computeForce(bodies[q], bodies[p]);
-                    // forces[p] -= computeForce(bodies[q], bodies[p]);
-                }
+                forces[q] += computeForce(bodies[q], bodies[p]);
+                forces[p] -= computeForce(bodies[q], bodies[p]);
             }
         }
     }
@@ -29,23 +26,11 @@ void NbodySolver::step()
     {
         for (int q = 0; q < bodies.size(); q++)
         {
-            //Backward Euler (suffers from energy drift)
-            bodies[q].updatePosition(deltaT * bodies[q].getVelocity());
-            bodies[q].updateVelocity(deltaT * bodies[q].getAcceleration());
-            bodies[q].setAcceleration(1.0 / bodies[q].getMass() * forces[q]);
-
-            // std::cout << bodies[q].getAcceleration() << std::endl;
-
-            //Symplectic Euler (still some energy drift)
-            // bodies[q].updateVelocity(deltaT * bodies[q].getAcceleration());
-            // bodies[q].updatePosition(deltaT * bodies[q].getVelocity());
-            // bodies[q].setAcceleration(1.0 / bodies[q].getMass() * forces[q]);
-
-            //Leapfrog algorithm
-            // bodies[q].updatePosition(deltaT*bodies[q].getVelocity()+0.5*deltaT*deltaT*bodies[q].getAcceleration());
-            // auto acc_new = 1.0 / bodies[q].getMass() * forces[q];
-            // bodies[q].updateVelocity(deltaT*0.5*(bodies[q].getAcceleration() + acc_new));
-            // bodies[q].setAcceleration(acc_new);
+            // Leapfrog KDK integrator
+            bodies[q].updateVelocity(0.5 * bodies[q].getAcceleration() * deltaT);
+            bodies[q].updatePosition(bodies[q].getVelocity() * deltaT);
+            bodies[q].setAcceleration(forces[q] / bodies[q].getMass());
+            bodies[q].updateVelocity(0.5 * bodies[q].getAcceleration() * deltaT);
         }
     }
 }
@@ -59,6 +44,7 @@ void NbodySolver::output()
 {
     for (int i = 0; i < bodies.size(); i++)
     {
-        std::cout << bodies[i].getPosition() << std::endl << bodies[i].getAcceleration() << std::endl;
+        std::cout << bodies[i].getPosition() << std::endl
+                  << bodies[i].getAcceleration() << std::endl;
     }
 }
