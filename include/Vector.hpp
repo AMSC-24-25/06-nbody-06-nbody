@@ -3,6 +3,7 @@
 
 #include <array>
 #include <iostream>
+// #include <cassert>
 
 template <typename T, size_t N>
 class Vector
@@ -17,6 +18,12 @@ public:
     Vector() { comps.fill(0); }
     Vector(const std::array<T,N> &init) : comps(init) {}
     Vector(const Vector &init) : comps(init.comps) {}
+
+    // // Constructor to initialize a Vector
+    // Vector(const std::initializer_list<T>& init) {
+    //     assert(init.size() == N && "Initializer list size must match vector dimensions.");
+    //     std::copy(init.begin(), init.end(), comps.begin());
+    // }
 
     // Arithmetic operators
     inline friend Vector operator+(const Vector &lhs, const Vector &rhs)
@@ -103,6 +110,8 @@ public:
         os << ")";
         return os;
     }
+
+    
 };
 
 // Definition of some useful types
