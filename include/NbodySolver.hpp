@@ -8,6 +8,8 @@ class NbodySolver
 {
 private:
     static const unsigned int dim = 2;
+    // static constexpr double G = 6.67e-11;
+    static constexpr double G = 1;
     const unsigned int numBodies;
     std::vector<Body<double, dim>> bodies;
     const std::string bodies_file_name;
@@ -19,7 +21,7 @@ private:
         Vector<double, dim> r = b1.getPosition() - b2.getPosition();
         double dist = r.norm();
         double dist_cube = dist * dist * dist;
-        r = -(6.67e-11 * b1.getMass() * b2.getMass() / dist_cube) * r;
+        r = -(G * b1.getMass() * b2.getMass() / dist_cube) * r;
         return r;
     }
 
