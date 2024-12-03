@@ -24,6 +24,7 @@ def animate_particles_with_vectors(file_path, num_particles):
     all_y = [y for pos in particle_positions.values() for y in pos[1]]
     ax.set_xlim(min(all_x) - 1, max(all_x) + 1)
     ax.set_ylim(min(all_y) - 1, max(all_y) + 1)
+    ax.set_aspect('equal')
     ax.set_xlabel('X Coordinate')
     ax.set_ylabel('Y Coordinate')
     ax.set_title('Animated Trajectories and Vectors of Particles')
@@ -59,7 +60,7 @@ def animate_particles_with_vectors(file_path, num_particles):
 
     # Create the animation
     frames = min(len(particle_positions[i][0]) for i in range(num_particles))
-    ani = FuncAnimation(fig, update, frames=frames, interval=500, blit=False)
+    ani = FuncAnimation(fig, update, frames=frames, interval=0.5, blit=False)
 
     plt.show()
 
