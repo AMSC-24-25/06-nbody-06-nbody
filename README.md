@@ -50,3 +50,8 @@ As a first optimization, we used a Leapfrog KDK scheme, which is second order, a
 ```math
 \vec{v}_q(t+\Delta t) = \vec{v}_q(t+\frac{\Delta t}{2})+\vec{a}_q(t+\Delta t)\frac{\Delta t}{2}
 ```
+
+## Results
+(parameters taken from [Periodic Planar Collisionless Three-Body Orbits](https://numericaltank.sjtu.edu.cn/three-body/three-body-movies.htm))
+
+![I.A. i.c. 1](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/solver/tests/solver_test/three-IA-ic-1.gif)
