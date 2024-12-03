@@ -60,6 +60,16 @@ public:
         return res;
     }
 
+    inline friend Vector operator*(const Vector &rhs,const T &scalar)
+    {
+        return scalar*rhs;
+    }
+
+    inline friend Vector operator/(const Vector &rhs,const T &scalar)
+    {
+        return (1.0/scalar)*rhs;
+    }
+
     // WARNING: THIS IS DANGEROUS WHEN WORKING WITH FLOATS AND DOUBLES
     inline friend bool operator==(const Vector &lhs, const Vector &rhs)
     {
@@ -68,6 +78,7 @@ public:
                 return false;
         return true;
     }
+
     // Vector utilities
     inline const T norm() const
     {
