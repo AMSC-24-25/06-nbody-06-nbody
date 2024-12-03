@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
+from matplotlib.animation import FuncAnimation, PillowWriter
 
-def animate_particles_with_vectors(file_path, num_particles):
+def export_particles_animation_to_gif(file_path, num_particles, save_as_gif, fps=20):
     # Initialize lists to hold coordinates and vectors for all particles
     particle_positions = {i: ([], []) for i in range(num_particles)}  # {0: ([x1], [y1]), 1: ([x2], [y2]), ...}
     particle_vectors = {i: ([], []) for i in range(num_particles)}   # {0: ([vx1], [vy1]), 1: ([vx2], [vy2]), ...}
@@ -24,7 +24,7 @@ def animate_particles_with_vectors(file_path, num_particles):
     all_y = [y for pos in particle_positions.values() for y in pos[1]]
     ax.set_xlim(min(all_x) - 1, max(all_x) + 1)
     ax.set_ylim(min(all_y) - 1, max(all_y) + 1)
-    ax.set_aspect('equal')
+    ax.set_aspect('equal')  # Ensure equal scaling of x and y axes
     ax.set_xlabel('X Coordinate')
     ax.set_ylabel('Y Coordinate')
     ax.set_title('Animated Trajectories and Vectors of Particles')
@@ -60,11 +60,13 @@ def animate_particles_with_vectors(file_path, num_particles):
 
     # Create the animation
     frames = min(len(particle_positions[i][0]) for i in range(num_particles))
-    ani = FuncAnimation(fig, update, frames=frames, interval=0.5, blit=False)
+    ani = FuncAnimation(fig, update, frames=frames, interval=3, blit=False)
 
-    plt.show()
+    # Save animation as GIF
+    ani.save(save_as_gif, writer=PillowWriter(fps=fps))
+    print(f"Animation saved as {save_as_gif}")
 
 # Example usage:
 file_path = 'output.txt'  # Replace with your file name
 num_particles = 3  # Adjust this for the number of particles
-animate_particles_with_vectors(file_path, num_particles)
+export_particles_animation_to_gif(file_path, num_particles, save_as_gif="three-IA-ic-1.gif", fps=20)

@@ -8,7 +8,7 @@ int main(int argc, char **argv)
     // 2d 3 bodies I.A. i.c. 1 from https://numericaltank.sjtu.edu.cn/three-body/three-body-movies.htm
     const double deltaT = 1e-5;
     const double numBodies = 3;
-    const double T = 100;
+    const double T = 10;
     const unsigned int outputFreq = 1000;
 
     NbodySolver solver(numBodies, deltaT);
