@@ -7,7 +7,7 @@ LDLIBS = -lGL -lGLEW -lSDL2
 INCLUDE = -Iinclude
 
 EXE = main
-OBJS = main.o Visualizer.o
+OBJS = main.o Renderer.o ShaderProgram.o
 
 all: $(BUILD_DIR) $(EXE)
 

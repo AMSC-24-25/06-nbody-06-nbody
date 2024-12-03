@@ -1,11 +1,11 @@
-#include "Visualizer.hpp"
+#include "Renderer.hpp"
 
 int main()
 {
-    Visualizer visualizer(1280, 720, "nbody");
+    Renderer renderer(900, 900);
 
-    if (visualizer.init()) {
-        visualizer.run();
+    if (renderer.init()) {
+        renderer.run();
     }
 
     return 0;
