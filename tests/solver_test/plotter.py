@@ -27,7 +27,7 @@ def export_particles_animation_to_gif(file_path, num_particles, save_as_gif, fps
     ax.set_aspect('equal')  # Ensure equal scaling of x and y axes
     ax.set_xlabel('X Coordinate')
     ax.set_ylabel('Y Coordinate')
-    ax.set_title('Animated Trajectories and Vectors of Particles')
+    ax.set_title('Šuvakov - Sheen Loop−ended−triangles')
 
     # Initialize markers, trajectories, and vectors for all particles
     particle_markers = []
