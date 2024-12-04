@@ -6,9 +6,9 @@ using namespace std;
 int main(int argc, char **argv)
 {
     // 2d 3 bodies I.A. i.c. 1 from https://numericaltank.sjtu.edu.cn/three-body/three-body-movies.htm
-    const double deltaT = 1e-4;
-    const double numBodies = 3;
-    const double T = 5;
+    const Real deltaT = 1e-4;
+    const Real numBodies = 3;
+    const Real T = 5;
     const unsigned int outputFreq = 1000;
 
     NbodySolver solver(numBodies, deltaT);
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 
     // Proceed with the simulation
     unsigned int timestepCounter = 0;
-    for (double t = 0; t < T; t += deltaT)
+    for (Real t = 0; t < T; t += deltaT)
     {
         solver.step();
         if (timestepCounter % outputFreq == 0)
