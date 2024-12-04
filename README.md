@@ -7,7 +7,7 @@ want to know the positions and velocities of a collection of molecules or atoms.
 n-body solver is a program that finds the solution to an n-body problem by simulating
 the behavior of the particles.
 
-## First formulation (
+## First formulation
 We started our developing from an n-body solver that simulates the motions
 of planets or stars.<br />
 That is, the force excerted on particle $`q`$ by particle $`p`$ is given by
