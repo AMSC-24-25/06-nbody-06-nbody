@@ -8,7 +8,7 @@ void NbodySolver::setup()
 
 void NbodySolver::step()
 {
-    std::vector<Vector<double, dim>> forces(numBodies);
+    std::vector<Vector<Real, dim>> forces(numBodies);
     // Compute forces
     {
         // TODO: THIS IS THE PART THAT CAN BE PARALLELIZED
