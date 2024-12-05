@@ -9,9 +9,25 @@
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
 
+#include "Vector.hpp"
+#include "Camera.hpp"
 #include "ShaderProgram.hpp"
 
-constexpr unsigned int N = 5;
+constexpr unsigned int N = 800;
+
+using vec3f = Vector<float, 3>;
+using vec3d = Vector<double, 3>;
+
+Renderer::Renderer(unsigned int window_width,
+                   unsigned int window_height) :
+    _window_width(window_width),
+    _window_height(window_height),
+    _window_title("nbody"),
+    _camera(M_PI / 2,
+            // TODO: use static_cast
+            (float) window_width / window_height,
+            -0.01,
+            -100.0) {}
 
 bool Renderer::init()
 {
@@ -42,8 +58,8 @@ void Renderer::run()
         float vx = -pos[i][1];
         float vy = pos[i][0];
         float mag = sqrt(vx * vx + vy * vy);
-        vel[i][0] = vx / mag * 100;
-        vel[i][1] = vy / mag * 100;
+        vel[i][0] = vx / mag * 300;
+        vel[i][1] = vy / mag * 500;
     }
 
     pos[0][0] = 0.0f;
@@ -57,12 +73,13 @@ void Renderer::run()
         _handleEvents();
 
         for (unsigned int i = 0; i < N; ++i) {
+            forces[i][0] = 0.0f;
+            forces[i][1] = 0.0f;
+        }
 
-            forces[i][0] = 0.0;
-            forces[i][1] = 0.0;
-
-            for (unsigned int j = 0; j < N; ++j) {
-                if (i == j) continue;
+        for (unsigned int i = 0; i < N; ++i) {
+            // Pacheco first optimization
+            for (unsigned int j = i + 1; j < N; ++j) {
 
                 float dist_x = pos[j][0] - pos[i][0];
                 float dist_y = pos[j][1] - pos[i][1];
@@ -71,10 +88,16 @@ void Renderer::run()
                 float rad_x = dist_x / dist;
                 float rad_y = dist_y / dist;
 
-                forces[i][0] += 100.0 * pos[i][3] * pos[j][3] /
+                float force_x = 100.0 * pos[i][3] * pos[j][3] /
                     dist * dist * rad_x;
-                forces[i][1] += 100.0 * pos[i][3] * pos[j][3] /
+                float force_y = 100.0 * pos[i][3] * pos[j][3] /
                     dist * dist * rad_y;
+
+                forces[i][0] += force_x;
+                forces[i][1] += force_y;
+
+                forces[j][0] -= force_x;
+                forces[j][1] -= force_y;
             }
         }
 
@@ -93,6 +116,9 @@ void Renderer::run()
                      pos.data(),
                      GL_DYNAMIC_DRAW);
 
+        _camera.move({ 0.0, 0.0, 1.0 });
+        _camera.lookAt({ 0.0, 0.0, 0.0 });
+        _updateCamera(1.0 / 100);
         _renderFrame();
     }
 }
@@ -155,13 +181,14 @@ bool Renderer::_init()
 // Loads, compiles and links OpenGL shaders
 bool Renderer::_loadShaders()
 {
-    _shader_program = std::make_unique<ShaderProgram>();
+    // Needs to be called after OpenGL context creation
+    _shader_program.create();
 
-    return _shader_program->loadShader("shaders/particle.vert",
+    return _shader_program.loadShader("shaders/particle.vert",
                                       GL_VERTEX_SHADER) &&
-           _shader_program->loadShader("shaders/particle.frag",
+           _shader_program.loadShader("shaders/particle.frag",
                                       GL_FRAGMENT_SHADER) &&
-           _shader_program->link();
+           _shader_program.link();
 }
 
 // Allocates OpenGL buffers to draw a quadrilateral
@@ -244,8 +271,24 @@ void Renderer::_setupScene()
     // Enabling transparency
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    _camera.setPosition({ 0.0f, 0.0f, -5.0f });
+    _camera.lookAt({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
+
+    _camera.setOrbitMode(false);
+
+    _shader_program.loadUniformMat4("perspective_projection",
+                                    _camera.getPerspectiveProjection());
+    _updateCamera(0);
 }
 
+void Renderer::_updateCamera(float dt)
+{
+    _camera.update(dt);
+    // Updating the GLSL world to camera transformation matrix
+    _shader_program.loadUniformMat4("world_to_camera",
+                                    _camera.getWorldToCamera());
+}
 
 // Handles keyboard and mouse inputs
 void Renderer::_handleEvents()
@@ -266,7 +309,7 @@ void Renderer::_handleEvents()
 // Renders a single frame to the window
 void Renderer::_renderFrame()
 {
-    _shader_program->use();
+    _shader_program.enable();
 
     glClear(GL_COLOR_BUFFER_BIT);
     // glBindVertexArray(_quad_vao);

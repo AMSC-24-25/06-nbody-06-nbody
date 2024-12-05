@@ -3,19 +3,17 @@
 
 #include <string>
 #include <memory>
+#include <cmath>
 
 #include <SDL2/SDL.h>
 
+#include "Camera.hpp"
 #include "ShaderProgram.hpp"
 
 class Renderer
 {
 public:
-    Renderer(int window_width,
-             int window_height) :
-        _window_width(window_width),
-        _window_height(window_height),
-        _window_title("nbody") {}
+    Renderer(unsigned int window_width, unsigned int window_height);
 
     bool init();
     void run();
@@ -29,6 +27,7 @@ private:
 
     void _allocBuffers();
     void _setupScene();
+    void _updateCamera(float dt);
 
     void _handleEvents();
     void _renderFrame();
@@ -45,7 +44,9 @@ private:
     GLuint _quad_vao;
     GLuint _particles_ssbo;
 
-    std::unique_ptr<ShaderProgram> _shader_program;
+    ShaderProgram _shader_program;
+
+    Camera _camera;
 };
 
 #endif
