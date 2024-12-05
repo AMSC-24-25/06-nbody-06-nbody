@@ -6,15 +6,24 @@
 
 #include <GL/glew.h>
 
+#include "Matrix.hpp"
+
 class ShaderProgram
 {
 public:
+    void create();
 
-    ShaderProgram();
-
-    bool loadShader(const std::string &source_path, GLenum shader_type);
+    // Loads a shader from file, compiles it and
+    // attaches it to the program
+    bool loadShader(const std::string &source_path,
+                    GLenum shader_type);
+    // Links the shaders attached to the program
     bool link();
-    void use();
+    // Enables the program
+    void enable();
+    // Loads a matrix inside a mat4 GLSL uniform
+    bool loadUniformMat4(const std::string &name,
+                         const Matrix<float, 4, 4> &value);
 
     ~ShaderProgram();
 

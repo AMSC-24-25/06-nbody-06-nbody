@@ -6,8 +6,11 @@
 
 #include <GL/glew.h>
 
-ShaderProgram::ShaderProgram()
+#include "Matrix.hpp"
+
+void ShaderProgram::create()
 {
+    // Requires an active OpenGL context
     _program_id = glCreateProgram();
 }
 
@@ -43,13 +46,13 @@ bool ShaderProgram::loadShader(const std::string &source_path,
         glGetShaderInfoLog(shader, _MAX_LOG_LENGTH, nullptr, buffer.data());
         std::cout << "Error while compiling shader " << source_path <<
             ": " << buffer.data();
-        return false;
+    } else {
+        glAttachShader(_program_id, shader);
     }
 
-    glAttachShader(_program_id, shader);
     glDeleteShader(shader);
 
-    return true;
+    return success;
 }
 
 bool ShaderProgram::link()
@@ -69,15 +72,29 @@ bool ShaderProgram::link()
                             nullptr,
                             buffer.data());
         std::cout << "Error while linking program: " << buffer.data();
-        return false;
     }
 
-    return true;
+    return success;
 }
 
-void ShaderProgram::use()
+void ShaderProgram::enable()
 {
     glUseProgram(_program_id);
+}
+
+bool ShaderProgram::loadUniformMat4(const std::string &name,
+                                    const Matrix<float, 4, 4> &value)
+{
+    GLuint location = glGetUniformLocation(_program_id, name.c_str());
+
+    if (location != -1u) {
+        enable();
+        // GL_TRUE transposes the matrix since GLSL works
+        // with colum major ordering
+        glUniformMatrix4fv(location, 1, GL_TRUE, value.data());
+    }
+
+    return location > 0;
 }
 
 ShaderProgram::~ShaderProgram()
