@@ -1,12 +1,13 @@
 #include <NbodySolver.hpp>
-#include <iostream>
 
-void NbodySolver::setup()
+
+void NbodySolver::loadBodies(const std::string &bodies_file_name)
 {
-    // TODO: HERE IT SHOULD LOAD THE BODIES FROM FILE AND PUT THEM IN THE VECTOR
+    bodies = IO<Real, dim>::readBodiesFromFile(bodies_file_name);
+    numBodies = bodies.size();
 }
 
-void NbodySolver::step()
+void NbodySolver::step(const Real &deltaT)
 {
     std::vector<Vector<Real, dim>> forces(numBodies);
     // Compute forces
@@ -35,16 +36,12 @@ void NbodySolver::step()
     }
 }
 
-void NbodySolver::output(const std::string &output_file_name)
+void NbodySolver::outputData(std::ofstream &output_file) const
 {
-    // TODO: HERE IT SHOULD TAKE THE VECTOR AND SAVE IT TO A FILE, WHICH WILL BE FED IN THE VISUALIZER
+    IO<Real,dim>::writeBodiesInfo(output_file,bodies);
 }
 
-void NbodySolver::output()
+void NbodySolver::outputTimestep(std::ofstream &output_file) const
 {
-    for (int i = 0; i < bodies.size(); i++)
-    {
-        std::cout << bodies[i].getPosition() << std::endl
-                  << bodies[i].getAcceleration() << std::endl;
-    }
+    IO<Real,dim>::writeSimulationData(output_file,bodies);
 }

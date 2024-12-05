@@ -15,11 +15,11 @@ private:
 
 public:
     Body(const massT &mass_init, const std::initializer_list<T> &pos_init, const std::initializer_list<T> &vel_init) : mass(mass_init),
-                                                                                                                      pos(pos_init),
-                                                                                                                      vel(vel_init) {}
+                                                                                                                       pos(pos_init),
+                                                                                                                       vel(vel_init) {}
     Body(const massT &mass_init, const Vector<T, N> &pos_init, const Vector<T, N> &vel_init) : mass(mass_init),
-                                                                                            pos(pos_init),
-                                                                                            vel(vel_init) {}
+                                                                                               pos(pos_init),
+                                                                                               vel(vel_init) {}
 
     const massT getMass() const
     {
@@ -41,32 +41,32 @@ public:
         return acc;
     }
 
-    void updatePosition(const Vector<T, N> &deltaPos)
+    inline void updatePosition(const Vector<T, N> &deltaPos)
     {
         pos += deltaPos;
     }
 
-    void setPosition(const Vector<T, N> &newPos)
+    inline void setPosition(const Vector<T, N> &newPos)
     {
         pos = newPos;
     }
 
-    void updateVelocity(const Vector<T, N> &deltaVel)
+    inline void updateVelocity(const Vector<T, N> &deltaVel)
     {
         vel += deltaVel;
     }
 
-    void setVelocity(const Vector<T, N> &newVel)
+    inline void setVelocity(const Vector<T, N> &newVel)
     {
         vel = newVel;
     }
 
-    void updateAcceleration(const Vector<T, N> &deltaAcc)
+    inline void updateAcceleration(const Vector<T, N> &deltaAcc)
     {
         acc += deltaAcc;
     }
 
-    void setAcceleration(const Vector<T, N> &newAcc)
+    inline void setAcceleration(const Vector<T, N> &newAcc)
     {
         acc = newAcc;
     }
@@ -74,11 +74,7 @@ public:
     // Stream operators
     inline friend std::ostream &operator<<(std::ostream &os, const Body &body)
     {
-        os << body.getMass() << " "
-           << body.getPosition() << " "
-           << body.getVelocity() << " "
-           << body.getAcceleration();
-
+        os << body.getPosition();
         return os;
     }
 };
