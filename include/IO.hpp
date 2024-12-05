@@ -7,11 +7,12 @@
 #include <fstream>
 #include <sstream>
 
+template <typename T, int dim>
 class IO
 {
 public:
     // Read body data from a file
-    static std::vector<Body2d> readBodiesFromFile(const std::string &filename)
+    static std::vector<Body<T, dim>> readBodiesFromFile(const std::string &filename)
     {
         std::ifstream file(filename);
 
@@ -21,30 +22,55 @@ public:
             return {};
         }
 
-        std::vector<Body2d> bodies;
+        std::vector<Body<T, dim>> bodies;
         std::string line;
 
-        while (std::getline(file, line))
+        int numBodies;
         {
-            // Skip empty lines
-            if (line.empty())
-                continue;
-
+            std::getline(file, line);
             std::istringstream iss(line);
-            double mass, x, y, vx, vy;
+            iss >> numBodies;
+        }
+        for (int i = 0; i < numBodies; i++)
+        {
 
-            // Try to read 5 values
-            if (iss >> mass >> x >> y >> vx >> vy)
+            // Read mass
+            massT mass;
             {
-                Vector2d position = {x, y};
-                Vector2d velocity = {vx, vy};
+                std::getline(file, line);
+                std::istringstream iss(line);
+                // Read mass
+                iss >> mass;
+            }
 
-                bodies.emplace_back(mass, position, velocity);
-            }
-            else
+            // Read position
+            std::vector<T> pos;
             {
-                std::cerr << "Error parsing line: " << line << std::endl;
+                std::getline(file, line);
+                std::istringstream iss(line);
+
+                for (int i = 0; i < dim; i++)
+                {
+                    T value;
+                    iss >> value;
+                    pos.emplace_back(value);
+                }
             }
+
+            // Read velocity
+            std::vector<T> vel;
+            {
+                std::getline(file, line);
+                std::istringstream iss(line);
+                for (int i = 0; i < dim; i++)
+                {
+                    T value;
+                    iss >> value;
+                    vel.emplace_back(value);
+                }
+            }
+
+            bodies.emplace_back(Body<T, dim>(mass, Vector<T, dim>(pos), Vector<T, dim>(vel)));
         }
 
         file.close();
@@ -62,14 +88,15 @@ public:
             return;
         }
 
+        file << bodies.size() << std::endl;
+
         for (const auto &body : bodies)
         {
-            file << static_cast<int>(body.getMass()) << " "
-                 << static_cast<int>(body.getPosition()[0]) << " "
-                 << static_cast<int>(body.getPosition()[1]) << " "
-                 << static_cast<int>(body.getVelocity()[0]) << " "
-                 << static_cast<int>(body.getVelocity()[1]) << "\n";
+            file << body.getMass() << std::endl
+                 << body.getPosition() << std::endl
+                 << body.getVelocity() << std::endl;
         }
+
         file.close();
     }
 };
