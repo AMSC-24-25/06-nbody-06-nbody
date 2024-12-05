@@ -2,6 +2,7 @@
 #define VECTOR_HPP_
 
 #include <array>
+#include <cmath>
 #include <iostream>
 
 template <typename T, size_t N>
@@ -18,16 +19,19 @@ public:
     Vector(const std::array<T,N> &init) : comps(init) {}
     Vector(const Vector &init) : comps(init.comps) {}
 
+    inline Vector &operator=(const Vector &rhs) = default;
+
     // Arithmetic operators
     inline friend Vector operator+(const Vector &lhs, const Vector &rhs)
     {
         Vector res;
-        for (int i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
         {
             res[i] = lhs[i] + rhs[i];
         }
         return res;
     }
+
     Vector &operator+=(const Vector &rhs)
     {
         *this = *this + rhs;
@@ -37,12 +41,13 @@ public:
     inline friend Vector<T, N> operator-(const Vector &lhs, const Vector &rhs)
     {
         Vector res;
-        for (int i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
         {
             res[i] = lhs[i] - rhs[i];
         }
         return res;
     }
+
     Vector &operator-=(const Vector &rhs)
     {
         *this = *this - rhs;
@@ -52,7 +57,7 @@ public:
     inline friend Vector operator*(const T &scalar, const Vector &rhs)
     {
         Vector res;
-        for (int i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
         {
             res[i] = rhs[i] * scalar;
         }
@@ -60,24 +65,56 @@ public:
         return res;
     }
 
+    Vector &operator*=(const T &scalar)
+    {
+        *this = scalar * *this;
+        return *this;
+    }
+
+    // Cross product specialization for 3d vectors
+    inline static Vector<T, 3> cross(const Vector<T, 3> &lhs,
+                               const Vector<T, 3> &rhs)
+    {
+        Vector<T, 3> res;
+
+        res[0] = lhs[1] * rhs[2] - lhs[2] * rhs[1];
+        res[1] = lhs[2] * rhs[0] - lhs[0] * rhs[2];
+        res[2] = lhs[0] * rhs[1] - lhs[1] * rhs[0];
+
+        return res;
+    }
+
     // WARNING: THIS IS DANGEROUS WHEN WORKING WITH FLOATS AND DOUBLES
     inline friend bool operator==(const Vector &lhs, const Vector &rhs)
     {
-        for (int i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
             if (lhs[i] != rhs[i])
                 return false;
         return true;
     }
+
     // Vector utilities
     inline const T norm() const
     {
         T norm = 0;
-        for (int i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
         {
             norm += comps[i] * comps[i];
         }
 
         return sqrt(norm);
+    }
+
+    // Normalizes the vector in place
+    inline Vector &normalize()
+    {
+        T _norm = norm();
+
+        for (size_t i = 0; i < N; i++) {
+            comps[i] /= _norm;
+        }
+
+        return *this;
     }
 
     // Access operators
@@ -88,6 +125,11 @@ public:
     inline const T &operator[](size_t coord) const
     {
         return comps[coord];
+    }
+
+    T *data() const
+    {
+        return comps.data();
     }
 
     // Stream operators
@@ -108,5 +150,9 @@ public:
 // Definition of some useful types
 typedef Vector<double, 2> Vector2d;
 typedef Vector<double, 3> Vector3d;
+
+// Explicit definition of static members is needed
+template<typename T, size_t N>
+const Vector<T, N> Vector<T, N>::ZERO;
 
 #endif
