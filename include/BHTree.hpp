@@ -7,9 +7,9 @@
 #include <memory>
 #include <cmath>
 
-const double G = 1; // Gravitational constant
-const double THETA = 0.1;     // Barnes-Hut threshold parameter
-const double EPSILON = 0.0;   // Softening factor for force calculation
+const double G = 1;         // Gravitational constant
+const double THETA = 0.1;   // Barnes-Hut threshold parameter
+const double EPSILON = 0.0; // Softening factor for force calculation (not using now for small size bodies)
 
 template <typename T>
 class BHTree
@@ -21,7 +21,7 @@ private:
     std::unique_ptr<BHTree> NE;
     std::unique_ptr<BHTree> SW;
     std::unique_ptr<BHTree> SE;
-    bool isExternal;
+    bool isExternal; // External nodes are like leaves in the binary tree
 
     // Helper method to combine 2 bodies together
     static Body<T, 2> combineBodies(const Body<T, 2> &a, const Body<T, 2> &b)
@@ -49,7 +49,7 @@ public:
             return;
         }
 
-        // If this is an external node with a body, split and rearrange the tree structure
+        // If this is an external node (leaf for binary tree), split and rearrange the tree structure
         if (isExternal)
         {
             isExternal = false;
@@ -90,7 +90,7 @@ public:
         }
         else
         {
-            // Internal node: update center of mass of current cluster and insert b recursively
+            // Internal node: multiple childs update center of mass of current cluster and insert b recursively
             cluster = combineBodies(cluster, b);
 
             Vector<T, 2> newPos = b.getPosition();
@@ -114,24 +114,8 @@ public:
             // Not adding force to itself or non-existent bodies
             if (cluster.getMass() > 0 && &cluster != &b)
             {
-                Vector<T, 2> r = cluster.getPosition() - b.getPosition();
-                T distance = r.norm();
-
-                // Add check for minimum distance to prevent division by zero
-                // if (distance < 1e-32)
-                //     return; // Skip if bodies are too close
-
-                // Use softened force calculation
-                T softenedDistance = std::sqrt(distance * distance + EPSILON * EPSILON);
-                T force = (G * b.getMass() * cluster.getMass()) / (softenedDistance * softenedDistance);
-
-                // Check for valid force value
-                if (std::isfinite(force))
-                {
-                    // Normalize r for direction
-                    Vector<T, 2> forceVector = r * (force / distance);
-                    b.updateAcceleration(forceVector / b.getMass());
-                }
+                Vector<T, 2> forceVector = calculateForce(cluster, b);
+                b.updateAcceleration(forceVector / b.getMass());
             }
             return;
         }
@@ -140,23 +124,11 @@ public:
         Vector<T, 2> r = cluster.getPosition() - b.getPosition();
         T distance = r.norm();
 
-        // Add check for minimum distance
-        // if (distance < 1e-32)
-        //     return;// Skip if bodies are too close because the force is too large to exceed the limit of double
-
-        // Cluster instead of single body: threshold for Barnes-Hut
+        // Threshold for Barnes-Hut about if we can treat a cluster as a single body when it is far away
         if (quad.getLength() / distance < THETA)
         {
-            // Use softened force calculation
-            T softenedDistance = std::sqrt(distance * distance + EPSILON * EPSILON);
-            T force = (G * b.getMass() * cluster.getMass()) / (softenedDistance * softenedDistance);
-
-            // Check for valid force value
-            if (std::isfinite(force))
-            {
-                Vector<T, 2> forceVector = r * (force / distance);
-                b.updateAcceleration(forceVector / b.getMass());
-            }
+            Vector<T, 2> forceVector = calculateForce(cluster, b);
+            b.updateAcceleration(forceVector / b.getMass());
         }
         else
         {
@@ -172,7 +144,25 @@ public:
         }
     }
 
-    // Destructor: The std::unique_ptr members will automatically handle the deletion of their managed objects when the BHTree object is destroyed.
+    // Here we should use a gereral force function in the future
+    const Vector<T, 2> calculateForce(Body<T, 2> &cluster, Body<T, 2> &b) const
+    {
+        Vector<T, 2> r = cluster.getPosition() - b.getPosition();
+        T distance = r.norm();
+
+        // Add check for minimum distance to prevent division by zero or instability
+        if (distance < 1e-32)
+            distance = 1e-32; // Avoid extremely small distances, maybe there exists a better way
+
+        // Use softened force calculation (now using EPSILON = 0)
+        T softenedDistance = std::sqrt(distance * distance + EPSILON * EPSILON);
+        T force = (G * b.getMass() * cluster.getMass()) / (softenedDistance * softenedDistance);
+        // Normalize r for direction
+        Vector<T, 2> forceVector = r * (force / distance);
+        return forceVector;
+    }
+
+    // Destroy: std::unique_ptr members automatically handle deletion of their managed objects when the Tree object is destroyed.
     ~BHTree() = default;
 };
 
