@@ -3,6 +3,7 @@
 
 #include <array>
 #include <iostream>
+#include <cmath>
 
 template <typename T, size_t N>
 class Vector
@@ -15,8 +16,17 @@ public:
     static const Vector ZERO;
     // Constructor
     Vector() { comps.fill(0); }
-    Vector(const std::array<T,N> &init) : comps(init) {}
+    Vector(const std::array<T, N> &init) : comps(init) {}
     Vector(const Vector &init) : comps(init.comps) {}
+    // Constructor that takes initializer_list
+    Vector(const std::initializer_list<T> &init)
+    {
+        if (init.size() != N)
+        {
+            throw std::invalid_argument("Initializer list size must match vector dimension");
+        }
+        std::copy(init.begin(), init.end(), comps.begin());
+    }
 
     // Arithmetic operators
     inline friend Vector operator+(const Vector &lhs, const Vector &rhs)
@@ -60,14 +70,14 @@ public:
         return res;
     }
 
-    inline friend Vector operator*(const Vector &rhs,const T &scalar)
+    inline friend Vector operator*(const Vector &rhs, const T &scalar)
     {
-        return scalar*rhs;
+        return scalar * rhs;
     }
 
-    inline friend Vector operator/(const Vector &rhs,const T &scalar)
+    inline friend Vector operator/(const Vector &rhs, const T &scalar)
     {
-        return (1.0/scalar)*rhs;
+        return (1.0 / scalar) * rhs;
     }
 
     // WARNING: THIS IS DANGEROUS WHEN WORKING WITH FLOATS AND DOUBLES
