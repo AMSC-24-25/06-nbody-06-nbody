@@ -55,9 +55,9 @@ public:
         return _data.at(i)[j];
     }
 
-    // Provides access to underlying buffer
-    T *data() const {
-        return _data.data();
+    // Provides read only access to underlying buffer
+    const T *data() const {
+        return &_data[0][0];
     }
 
 private:

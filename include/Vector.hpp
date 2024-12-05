@@ -4,6 +4,7 @@
 #include <array>
 #include <cmath>
 #include <iostream>
+#include <initializer_list>
 
 template <typename T, size_t N>
 class Vector
@@ -18,6 +19,10 @@ public:
     Vector() { comps.fill(0); }
     Vector(const std::array<T,N> &init) : comps(init) {}
     Vector(const Vector &init) : comps(init.comps) {}
+    Vector(const std::initializer_list<T> &init)
+    {
+        std::copy(init.begin(), init.end(), comps.begin());
+    }
 
     inline Vector &operator=(const Vector &rhs) = default;
 
@@ -127,7 +132,7 @@ public:
         return comps[coord];
     }
 
-    T *data() const
+    const T *data() const
     {
         return comps.data();
     }
