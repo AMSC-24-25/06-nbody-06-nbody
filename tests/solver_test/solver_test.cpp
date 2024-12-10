@@ -26,23 +26,24 @@ int main(int argc, char **argv)
     // Print bodies information
     solver.outputData(outFile);
     // Run solver
-    //Real initialE = solver.computeEnergy();
+    // Real initialE = solver.computeEnergy();
     unsigned int timestepCounter = 0;
-    for (Real t = 0; t < T; t += deltaT)
+    #pragma omp parallel
     {
-        chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-        solver.step(deltaT);
-        chrono::steady_clock::time_point end = chrono::steady_clock::now();
-        cout << chrono::duration_cast<chrono::microseconds>(end - begin).count() << endl;
-        if (timestepCounter % outputFreq == 0)
+        for (Real t = 0; t < T; t += deltaT)
         {
-            // cout << "Timestep: " << t << endl;
-            // Output timestep data
-            // solver.outputTimestep(outFile);
-            //Real currentE = solver.computeEnergy();
-            //cout << "Time: " << t << "\nTotal energy: " << currentE << "\nDeltaE: " << (currentE-initialE)/initialE << endl;
+            solver.step(deltaT);
+            if (timestepCounter % outputFreq == 0)
+            {
+                #pragma omp single
+                cout << "Timestep: " << t << endl;
+                // Output timestep data
+                // solver.outputTimestep(outFile);
+                // Real currentE = solver.computeEnergy();
+                // cout << "Time: " << t << "\nTotal energy: " << currentE << "\nDeltaE: " << (currentE-initialE)/initialE << endl;
+            }
+            timestepCounter++;
         }
-        timestepCounter++;
     }
 
     outFile.close();

@@ -9,10 +9,10 @@ void NbodySolver::loadBodies(const std::string &bodies_file_name)
 
 void NbodySolver::step(const Real &deltaT)
 {
-    std::vector<std::vector<Vector<Real, dim>>> forces(numBodies, std::vector<Vector<Real, dim>>(numBodies));
+    std::vector<std::vector<Vector<Real, dim>>> forces(omp_get_num_threads(), std::vector<Vector<Real, dim>>(numBodies));
     // Compute (local) forces
     {
-        #pragma omp parallel for
+        #pragma omp for
         for (int q = 0; q < bodies.size(); q++)
         {
             for (int p = q + 1; p < bodies.size(); p++)
@@ -26,12 +26,12 @@ void NbodySolver::step(const Real &deltaT)
 
     // Update bodies properties (position and velocity are updated using the old value)
     {
-        #pragma omp parallel for
+        #pragma omp for
         for (int q = 0; q < bodies.size(); q++)
         {
-            Compute total force from local forces
+            // Compute total force from local forces
             Vector<Real, dim> totForce;
-            for (int i = 0; i < bodies.size(); i++)
+            for (int i = 0; i < omp_get_num_threads(); i++)
             {
                 totForce += forces[i][q];
             }
