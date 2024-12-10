@@ -61,11 +61,11 @@ def animate_particles(file_path, fig_size=(5, 5)):
 
     # Create the animation
     frames = min(len(particle_positions[i][0]) for i in range(num_particles))
-    ani = FuncAnimation(fig, update, frames=frames, interval=5, blit=False)
+    ani = FuncAnimation(fig, update, frames=frames, interval=1, blit=False)
 
     # Show the animation
     plt.show()
-
+    
 # Example usage:
-file_path = 'build/output.txt'  # Replace with your file name
+file_path = 'build/bodyData.txt'  # Replace with your file name
 animate_particles(file_path, fig_size=(5, 5))
