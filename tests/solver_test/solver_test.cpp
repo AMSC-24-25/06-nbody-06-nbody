@@ -8,7 +8,7 @@ int main(int argc, char **argv)
     // Try 10000 iterations to test speedup
     const Real deltaT = 1e-4;
     const Real T = 1e-2;
-    const unsigned int outputFreq = 10;
+    const unsigned int outputFreq = 1;
 
     NbodySolver solver;
 
@@ -26,9 +26,10 @@ int main(int argc, char **argv)
     // Print bodies information
     solver.outputData(outFile);
     // Run solver
-    // Real initialE = solver.computeEnergy();
+    chrono::steady_clock::time_point begin = chrono::steady_clock::now();
+    chrono::steady_clock::time_point end;
     unsigned int timestepCounter = 0;
-    #pragma omp parallel
+    #pragma omp parallel num_threads(8)
     {
         for (Real t = 0; t < T; t += deltaT)
         {
@@ -36,11 +37,11 @@ int main(int argc, char **argv)
             if (timestepCounter % outputFreq == 0)
             {
                 #pragma omp single
-                cout << "Timestep: " << t << endl;
-                // Output timestep data
-                // solver.outputTimestep(outFile);
-                // Real currentE = solver.computeEnergy();
-                // cout << "Time: " << t << "\nTotal energy: " << currentE << "\nDeltaE: " << (currentE-initialE)/initialE << endl;
+                {
+                    end = chrono::steady_clock::now();
+                    cout << chrono::duration_cast<chrono::microseconds>(end - begin).count() << endl;
+                    begin = chrono::steady_clock::now();
+                }
             }
             timestepCounter++;
         }
