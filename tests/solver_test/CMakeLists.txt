@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.30)
 project(nbody_solver_test)
+find_package(OpenMP)
 
 # C++ Standard
 set(CMAKE_CXX_STANDARD 20)
@@ -17,3 +18,7 @@ set(MAIN_FILE "solver_test.cpp")
 set(TARGET_FILE "solver_test")
 
 add_executable("${TARGET_FILE}" "${MAIN_FILE}" ${SOURCES})
+
+if(OpenMP_CXX_FOUND)
+    target_link_libraries("${TARGET_FILE}" PUBLIC OpenMP::OpenMP_CXX)
+endif()
