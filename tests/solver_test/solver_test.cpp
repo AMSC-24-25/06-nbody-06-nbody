@@ -1,22 +1,22 @@
 #include <NbodySolver.hpp>
+#include <chrono>
 
 using namespace std;
 
 int main(int argc, char **argv)
 {
-    // 2d 3 bodies I.A. i.c. 1 from https://numericaltank.sjtu.edu.cn/three-body/three-body-movies.htm
-    const Real deltaT = 1e-6;
-    const Real T = 5;
-    const unsigned int outputFreq = 10000;
+    // Try 10000 iterations to test speedup
+    const Real deltaT = 1e-4;
+    const Real T = 1e-2;
+    const unsigned int outputFreq = 10;
 
     NbodySolver solver;
 
     // Load bodies
     solver.loadBodies("input.txt");
 
-    // Proceed with the simulation
     // Open output file (which is kept open till the end to reduce overhead)
-    ofstream outFile("output.txt");
+    ofstream outFile("bodyData.txt");
     if (!outFile.is_open())
     {
         cerr << "Error: Cannot open output file " << endl;
@@ -25,16 +25,22 @@ int main(int argc, char **argv)
 
     // Print bodies information
     solver.outputData(outFile);
-    // Run timesteps
+    // Run solver
+    //Real initialE = solver.computeEnergy();
     unsigned int timestepCounter = 0;
     for (Real t = 0; t < T; t += deltaT)
     {
+        chrono::steady_clock::time_point begin = chrono::steady_clock::now();
         solver.step(deltaT);
+        chrono::steady_clock::time_point end = chrono::steady_clock::now();
+        cout << chrono::duration_cast<chrono::microseconds>(end - begin).count() << endl;
         if (timestepCounter % outputFreq == 0)
         {
+            // cout << "Timestep: " << t << endl;
             // Output timestep data
-            solver.outputTimestep(outFile);
-            cout << "Time: " << t << endl;
+            // solver.outputTimestep(outFile);
+            //Real currentE = solver.computeEnergy();
+            //cout << "Time: " << t << "\nTotal energy: " << currentE << "\nDeltaE: " << (currentE-initialE)/initialE << endl;
         }
         timestepCounter++;
     }
