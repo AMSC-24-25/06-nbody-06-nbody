@@ -27,8 +27,6 @@ private:
     }
 
 public:
-    // Used in pair with the addBody function, mostly for testing
-
     // Manually add a body, this is used mostly for testing
     void addBody(const massT &mass_, const Vector<Real, dim> &pos, const Vector<Real, dim> &vel)
     {
@@ -54,6 +52,28 @@ public:
 
     // Output timestep data to the specified file
     void outputTimestep(std::ofstream &output_file) const;
+
+    // Compute initial energy, used for error evaluation
+    const Real computeEnergy() const
+    {
+        Real K = 0.0;
+        // Kinetic component
+        for (const auto &body : bodies)
+        {
+            K += 0.5 * body.getMass() * pow(body.getVelocity().norm(), 2.0);
+        }
+
+        Real U = 0.0;
+        // Potential component
+        for (int q = 0; q < bodies.size(); q++)
+        {
+            for (int p=q+1;p<bodies.size();p++){
+                U+=-G*bodies[p].getMass()*bodies[q].getMass()/((bodies[q].getPosition()-bodies[p].getPosition()).norm());
+            }
+        }
+
+        return K+U;
+    }
 };
 
 #endif
