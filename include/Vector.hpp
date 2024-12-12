@@ -5,6 +5,9 @@
 #include <cmath>
 #include <iostream>
 #include <initializer_list>
+#include <iostream>
+#include <vector>
+// #include <cassert>
 
 template <typename T, size_t N>
 class Vector
@@ -17,14 +20,36 @@ public:
     static const Vector ZERO;
     // Constructor
     Vector() { comps.fill(0); }
+
     Vector(const std::array<T,N> &init) : comps(init) {}
     Vector(const Vector &init) : comps(init.comps) {}
+    // Constructor that takes initializer_list
     Vector(const std::initializer_list<T> &init)
     {
+        if (init.size() != N)
+        {
+            throw std::invalid_argument("Initializer list size must match vector dimension");
+        }
         std::copy(init.begin(), init.end(), comps.begin());
     }
 
     inline Vector &operator=(const Vector &rhs) = default;
+
+    Vector(const std::vector<T> &init)
+    {
+        if (init.size() != N)
+        {
+            throw std::invalid_argument("Initializer list size must match vector dimension");
+        }
+
+        std::copy(init.begin(), init.end(), comps.begin());
+    }
+
+    // // Constructor to initialize a Vector
+    // Vector(const std::initializer_list<T>& init) {
+    //     assert(init.size() == N && "Initializer list size must match vector dimensions.");
+    //     std::copy(init.begin(), init.end(), comps.begin());
+    // }
 
     // Arithmetic operators
     inline friend Vector operator+(const Vector &lhs, const Vector &rhs)
@@ -89,6 +114,16 @@ public:
         return res;
     }
 
+    inline friend Vector operator*(const Vector &rhs,const T &scalar)
+    {
+        return scalar*rhs;
+    }
+
+    inline friend Vector operator/(const Vector &rhs,const T &scalar)
+    {
+        return (1.0/scalar)*rhs;
+    }
+
     // WARNING: THIS IS DANGEROUS WHEN WORKING WITH FLOATS AND DOUBLES
     inline friend bool operator==(const Vector &lhs, const Vector &rhs)
     {
@@ -136,18 +171,16 @@ public:
     {
         return comps.data();
     }
-
+        //
     // Stream operators
     inline friend std::ostream &operator<<(std::ostream &os, const Vector &vec)
     {
-        os << "(";
         for (std::size_t i = 0; i < N; ++i)
         {
             os << vec.comps[i];
             if (i < N - 1)
-                os << ", ";
+                os << " ";
         }
-        os << ")";
         return os;
     }
 };
