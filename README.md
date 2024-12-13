@@ -53,6 +53,10 @@ As a first optimization, we used a Leapfrog KDK scheme, which is second order, a
 
 ## Results
 (parameters taken from [Periodic Planar Three Body Orbits](https://observablehq.com/@rreusser/periodic-planar-three-body-orbits))
+### Body animations
+![I.A. i.c. 1](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/three-IA-ic-1.gif)
+![SS - LET](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/three-sheen-LET.gif)
 
-![I.A. i.c. 1](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/animations/three-IA-ic-1.gif)
-![SS - LET](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/animations/three-sheen-LET.gif)
+### Energy plots comparing the different integration methods
+![Forward Euler](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/3b-10T-6dT-FE.png)
+![Leapfrog](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/3b-10T-6dT-LEAP.png)
