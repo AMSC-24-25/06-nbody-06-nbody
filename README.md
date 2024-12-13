@@ -54,9 +54,11 @@ As a first optimization, we used a Leapfrog KDK scheme, which is second order, a
 ## Results
 (parameters taken from [Periodic Planar Three Body Orbits](https://observablehq.com/@rreusser/periodic-planar-three-body-orbits))
 ### Body animations
-<img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/three-IA-ic-1.gif" width=400 alt="I.A. i.c. 1">
-<img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/three-sheen-LET.gif" width=400 alt="SS - LET">
+| I.A. i.c. 1  | SS - LET |
+| ------------- | ------------- |
+| <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/three-IA-ic-1.gif" alt="I.A. i.c. 1"> | <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/three-sheen-LET.gif" alt="SS - LET"> |
 
 ### Energy plots comparing the different integration methods
-<img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/3b-10T-6dT-FE.png" width=400 alt="FE">
-<img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/3b-10T-6dT-LEAP.png" width=400 alt="LEAPFROG">
+| Forward Euler  | Leapfrog |
+| ------------- | ------------- |
+| <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/3b-10T-6dT-FE.png" alt="FE"> | <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/3b-10T-6dT-LEAP.png" alt="LEAPFROG"> |
