@@ -94,7 +94,7 @@ public:
     }
 
     // Write simulation data
-    static void writeSimulationData(ofstream &file, const vector<Body<T, dim>> &bodies)
+    inline static void writeSimulationData(ofstream &file, const vector<Body<T, dim>> &bodies)
     {
         for (const auto &body : bodies)
         {

@@ -21,22 +21,22 @@ public:
                                                                                                pos(pos_init),
                                                                                                vel(vel_init) {}
 
-    const massT getMass() const
+    inline const massT getMass() const
     {
         return mass;
     }
 
-    const Vector<T, N> &getPosition() const
+    inline const Vector<T, N> &getPosition() const
     {
         return pos;
     }
 
-    const Vector<T, N> &getVelocity() const
+    inline const Vector<T, N> &getVelocity() const
     {
         return vel;
     }
 
-    const Vector<T, N> &getAcceleration() const
+    inline const Vector<T, N> &getAcceleration() const
     {
         return acc;
     }
