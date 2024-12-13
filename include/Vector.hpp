@@ -38,12 +38,6 @@ public:
         std::copy(init.begin(), init.end(), comps.begin());
     }
 
-    // // Constructor to initialize a Vector
-    // Vector(const std::initializer_list<T>& init) {
-    //     assert(init.size() == N && "Initializer list size must match vector dimensions.");
-    //     std::copy(init.begin(), init.end(), comps.begin());
-    // }
-
     // Arithmetic operators
     inline friend Vector operator+(const Vector &lhs, const Vector &rhs)
     {
@@ -54,7 +48,7 @@ public:
         }
         return res;
     }
-    Vector &operator+=(const Vector &rhs)
+    inline Vector &operator+=(const Vector &rhs)
     {
         *this = *this + rhs;
         return *this;
@@ -69,7 +63,7 @@ public:
         }
         return res;
     }
-    Vector &operator-=(const Vector &rhs)
+    inline Vector &operator-=(const Vector &rhs)
     {
         *this = *this - rhs;
         return *this;
@@ -86,14 +80,14 @@ public:
         return res;
     }
 
-    inline friend Vector operator*(const Vector &rhs,const T &scalar)
+    inline friend Vector operator*(const Vector &rhs, const T &scalar)
     {
-        return scalar*rhs;
+        return scalar * rhs;
     }
 
-    inline friend Vector operator/(const Vector &rhs,const T &scalar)
+    inline friend Vector operator/(const Vector &rhs, const T &scalar)
     {
-        return (1.0/scalar)*rhs;
+        return (1.0 / scalar) * rhs;
     }
 
     // WARNING: THIS IS DANGEROUS WHEN WORKING WITH FLOATS AND DOUBLES
@@ -118,11 +112,12 @@ public:
     }
 
     // Access operators
-    inline T &operator[](size_t coord)
+    inline T &operator[](const size_t &coord)
     {
         return comps[coord];
     }
-    inline const T &operator[](size_t coord) const
+
+    inline const T &operator[](const size_t &coord) const
     {
         return comps[coord];
     }

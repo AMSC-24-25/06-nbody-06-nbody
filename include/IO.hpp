@@ -1,34 +1,40 @@
 #ifndef IO_HPP
 #define IO_HPP
 
-#include "Body.hpp"
+#include <Body.hpp>
 #include <vector>
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <iostream>
+
+using namespace std;
 
 template <typename T, int dim>
 class IO
 {
+private:
+    ofstream output;
+
 public:
     // Read body data from a file
-    static std::vector<Body<T, dim>> readBodiesFromFile(const std::string &filename)
+    static vector<Body<T, dim>> readBodiesFromFile(const string &filename)
     {
-        std::ifstream file(filename);
+        ifstream file(filename);
 
         if (!file.is_open())
         {
-            std::cerr << "Error: Cannot open file " << filename << std::endl;
+            cerr << "Error: Cannot open file " << filename << endl;
             return {};
         }
 
-        std::vector<Body<T, dim>> bodies;
-        std::string line;
+        vector<Body<T, dim>> bodies;
+        string line;
 
         int numBodies;
         {
-            std::getline(file, line);
-            std::istringstream iss(line);
+            getline(file, line);
+            istringstream iss(line);
             iss >> numBodies;
         }
         for (int i = 0; i < numBodies; i++)
@@ -37,17 +43,17 @@ public:
             // Read mass
             massT mass;
             {
-                std::getline(file, line);
-                std::istringstream iss(line);
+                getline(file, line);
+                istringstream iss(line);
                 // Read mass
                 iss >> mass;
             }
 
             // Read position
-            std::vector<T> pos;
+            vector<T> pos;
             {
-                std::getline(file, line);
-                std::istringstream iss(line);
+                getline(file, line);
+                istringstream iss(line);
 
                 for (int i = 0; i < dim; i++)
                 {
@@ -58,10 +64,10 @@ public:
             }
 
             // Read velocity
-            std::vector<T> vel;
+            vector<T> vel;
             {
-                std::getline(file, line);
-                std::istringstream iss(line);
+                getline(file, line);
+                istringstream iss(line);
                 for (int i = 0; i < dim; i++)
                 {
                     T value;
@@ -77,27 +83,23 @@ public:
         return bodies;
     }
 
-    // Write body data to a file
-    static void writeBodiesToFile(const std::string &filename, const std::vector<Body2d> &bodies)
+    // Write simulation header
+    static void writeBodiesInfo(ofstream &file, const vector<Body<T, dim>> &bodies)
     {
-        std::ofstream file(filename);
+        file << bodies.size() << endl;
 
-        if (!file.is_open())
-        {
-            std::cerr << "Error: Cannot open file " << filename << std::endl;
-            return;
+        for(const auto &body:bodies){
+            file << body.getMass() << endl;
         }
+    }
 
-        file << bodies.size() << std::endl;
-
+    // Write simulation data
+    inline static void writeSimulationData(ofstream &file, const vector<Body<T, dim>> &bodies)
+    {
         for (const auto &body : bodies)
         {
-            file << body.getMass() << std::endl
-                 << body.getPosition() << std::endl
-                 << body.getVelocity() << std::endl;
+            file << body << endl;
         }
-
-        file.close();
     }
 };
 
