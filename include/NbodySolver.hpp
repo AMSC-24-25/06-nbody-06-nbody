@@ -5,6 +5,7 @@
 #include <IO.hpp>
 #include <iostream>
 #include <vector>
+#include <omp.h>
 
 typedef double Real;
 
@@ -15,9 +16,10 @@ private:
     static constexpr Real G = 1;
     unsigned int numBodies;
     std::vector<Body<Real, dim>> bodies;
+    std::vector<std::vector<Vector<Real, dim>>> forces;
 
     // Generic force term
-    Vector<Real, dim> computeForce(const Body<Real, dim> &b1, const Body<Real, dim> &b2) const
+    inline Vector<Real, dim> computeForce(const Body<Real, dim> &b1, const Body<Real, dim> &b2) const
     {
         Vector<Real, dim> r = b1.getPosition() - b2.getPosition();
         Real dist = r.norm();
@@ -54,7 +56,7 @@ public:
     void outputTimestep(std::ofstream &output_file) const;
 
     // Compute initial energy, used for error evaluation
-    const Real computeEnergy() const
+    inline const Real computeEnergy() const
     {
         Real K = 0.0;
         // Kinetic component
@@ -67,12 +69,17 @@ public:
         // Potential component
         for (int q = 0; q < bodies.size(); q++)
         {
-            for (int p=q+1;p<bodies.size();p++){
-                U+=-G*bodies[p].getMass()*bodies[q].getMass()/((bodies[q].getPosition()-bodies[p].getPosition()).norm());
+            for (int p = q + 1; p < bodies.size(); p++)
+            {
+                U += -G * bodies[p].getMass() * bodies[q].getMass() / ((bodies[q].getPosition() - bodies[p].getPosition()).norm());
             }
         }
 
-        return K+U;
+        return K + U;
+    }
+
+    void initSharedVar(){
+        forces.resize(omp_get_num_threads(), std::vector<Vector<Real, dim>>(numBodies));
     }
 };
 
