@@ -13,7 +13,7 @@
 #include "Camera.hpp"
 #include "ShaderProgram.hpp"
 
-constexpr unsigned int N = 800;
+constexpr unsigned int N = 600;
 
 using vec3f = Vector<float, 3>;
 using vec3d = Vector<double, 3>;
@@ -24,9 +24,8 @@ Renderer::Renderer(unsigned int window_width,
     _window_height(window_height),
     _window_title("nbody"),
     _camera(M_PI / 2,
-            // TODO: use static_cast
-            (float) window_width / window_height,
-            -0.01,
+            static_cast<float>(window_width) / window_height,
+            -0.1,
             -100.0) {}
 
 bool Renderer::init()
@@ -71,6 +70,7 @@ void Renderer::run()
 
     while (_running) {
         _handleEvents();
+        _updateDeltaTime();
 
         for (unsigned int i = 0; i < N; ++i) {
             forces[i][0] = 0.0f;
@@ -83,6 +83,7 @@ void Renderer::run()
 
                 float dist_x = pos[j][0] - pos[i][0];
                 float dist_y = pos[j][1] - pos[i][1];
+
 
                 float dist = sqrt(dist_x * dist_x + dist_y * dist_y) + 1e-12;
                 float rad_x = dist_x / dist;
@@ -116,9 +117,10 @@ void Renderer::run()
                      pos.data(),
                      GL_DYNAMIC_DRAW);
 
-        _camera.move({ 0.0, 0.0, 1.0 });
-        _camera.lookAt({ 0.0, 0.0, 0.0 });
-        _updateCamera(1.0 / 100);
+        // _camera.move({ 0.0, 0.0, 1.0 });
+        // _camera.lookAt({ 0.0, 0.0, 0.0 });
+
+        _updateCamera();
         _renderFrame();
     }
 }
@@ -272,22 +274,14 @@ void Renderer::_setupScene()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    _camera.setPosition({ 0.0f, 0.0f, -5.0f });
+    _camera.setPosition({ 0.0f, 0.0f, -3.0f });
     _camera.lookAt({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
 
     _camera.setOrbitMode(false);
 
     _shader_program.loadUniformMat4("perspective_projection",
                                     _camera.getPerspectiveProjection());
-    _updateCamera(0);
-}
-
-void Renderer::_updateCamera(float dt)
-{
-    _camera.update(dt);
-    // Updating the GLSL world to camera transformation matrix
-    _shader_program.loadUniformMat4("world_to_camera",
-                                    _camera.getWorldToCamera());
+    _updateCamera();
 }
 
 // Handles keyboard and mouse inputs
@@ -302,8 +296,51 @@ void Renderer::_handleEvents()
              event.key.keysym.sym == SDLK_ESCAPE)
         ) {
             quit();
+        } else if (event.type == SDL_MOUSEWHEEL) {
+            // Zooming camera
+            vec3 zoom_delta({ 0, 0, event.wheel.preciseY });
+            _camera.move(zoom_delta);
         }
     }
+
+    // Handling mouse related events
+    static int prev_mouse_x, prev_mouse_y;
+
+    int mouse_x, mouse_y;
+    Uint32 mouse_btn_state = SDL_GetMouseState(&mouse_x, &mouse_y);
+
+    // Left click
+    if (mouse_btn_state & SDL_BUTTON(1)) {
+        // Normalize to canonical cube
+        vec3 normalized_mouse_delta({
+            2.0f / _window_width * (prev_mouse_x - mouse_x),
+            2.0f / _window_height * (prev_mouse_y - mouse_y),
+            0
+        });
+        // Translating camera
+        _camera.move(normalized_mouse_delta);
+    }
+
+    prev_mouse_x = mouse_x;
+    prev_mouse_y = mouse_y;
+}
+
+// Computes the time between two consecutive frames
+void Renderer::_updateDeltaTime()
+{
+    static Uint64 prev_ticks = 0;
+
+    Uint64 curr_ticks = SDL_GetTicks64();
+    _delta_time = static_cast<float>(curr_ticks - prev_ticks) / 1000;
+    prev_ticks = curr_ticks;
+}
+
+void Renderer::_updateCamera()
+{
+    _camera.update(_delta_time);
+    // Updating the GLSL world to camera transformation matrix
+    _shader_program.loadUniformMat4("world_to_camera",
+                                    _camera.getWorldToCamera());
 }
 
 // Renders a single frame to the window

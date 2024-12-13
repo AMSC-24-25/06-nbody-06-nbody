@@ -38,7 +38,7 @@ public:
     void move(const vec3 &delta);
     // Updates camera position and recomputes
     // world to camera transformation matrix
-    void update(double dt);
+    void update(float dt);
 
 private:
     // Computes the transformation matrix
@@ -52,39 +52,30 @@ private:
                                        float aspect_ratio,
                                        float near,
                                        float far);
-    // Performs backwards Euler integration to update
-    // cartesian or spherical position
-    void _updatePosition(vec3 &position,
-                         vec3 &velocity,
-                         vec3 &acceleration,
-                         float friction,
-                         float max_speed,
-                         float dt);
     // Converts current spherical coordinates position
     // to cartesian coordinates
     void _sphericalToCartesian();
 
     // Cartesian coordinates
     vec3 _position;
-    vec3 _velocity;
-    vec3 _acceleration;
     // Spherical coordinates used to orbit camera
     vec3 _spherical_position;
-    vec3 _spherical_velocity;
-    vec3 _spherical_acceleration;
+
+    // Vertical field of view
+    float _fovy;
+     // Window width / height
+    float _aspect_ratio;
     // Camera frame of reference axes
     vec3 _axis_u, _axis_v, _axis_n;
-
     // Transformation matrices
     mat4 _worldToCamera;
     mat4 _perspectiveProjection;
 
     bool _orbit_mode;
 
-    const double _MOVE_FRICTION = 0.99f;
-    const double _MOVE_MAX_SPEED = 10.0f;
-    const double _ORBIT_FRICTION = 0.99f;
-    const double _ORBIT_MAX_SPEED = 1.0f;
+    vec3 _target_position;
+
+    const float _MOVE_SPEED = 5.0f;
 };
 
 #endif

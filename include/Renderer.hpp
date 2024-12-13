@@ -27,9 +27,10 @@ private:
 
     void _allocBuffers();
     void _setupScene();
-    void _updateCamera(float dt);
 
     void _handleEvents();
+    void _updateDeltaTime();
+    void _updateCamera();
     void _renderFrame();
 
     bool _running = true;
@@ -47,6 +48,9 @@ private:
     ShaderProgram _shader_program;
 
     Camera _camera;
+
+    // Frametime
+    float _delta_time;
 };
 
 #endif

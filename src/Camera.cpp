@@ -9,6 +9,8 @@ Camera::Camera(float fovy,
                float aspect_ratio,
                float near,
                float far) :
+    _fovy(fovy),
+    _aspect_ratio(aspect_ratio),
     _axis_u({ 1.0, 0.0, 0.0 }),
     _axis_v({ 0.0, 1.0, 0.0 }),
     _axis_n({ 0.0, 0.0, -1.0 })
@@ -35,6 +37,7 @@ const mat4 &Camera::getPerspectiveProjection() const
 void Camera::setPosition(const vec3 &position)
 {
     _position = position;
+    _target_position = position;
 }
 
 void Camera::setSphericalPosition(const vec3 &position)
@@ -67,26 +70,25 @@ void Camera::lookAt(const vec3 &point, const vec3 &view_up)
 
 void Camera::move(const vec3 &delta)
 {
-    _acceleration = delta;
+    // Projecting delta back to xy plane
+    vec3 camera_delta({
+        delta[0] * _aspect_ratio * _position[2] * std::tan(_fovy / 2),
+        delta[1] * _position[2] * std::tan(_fovy / 2),
+        delta[2]
+    });
+
+    _target_position += camera_delta;
 }
 
-void Camera::update(double dt)
+void Camera::update(float dt)
 {
     if (_orbit_mode) {
-        _updatePosition(_spherical_position,
-                        _spherical_velocity,
-                        _spherical_acceleration,
-                        _ORBIT_FRICTION,
-                        _ORBIT_MAX_SPEED,
-                        dt);
+        // TODO: interpolate spherical coordinates
         _sphericalToCartesian();
     } else {
-        _updatePosition(_position,
-                        _velocity,
-                        _acceleration,
-                        _MOVE_FRICTION,
-                        _MOVE_MAX_SPEED,
-                        dt);
+        // Linearly interpolating
+        _position += dt * _MOVE_SPEED *
+            (_target_position - _position);
     }
 
     _computeWorldToCamera();
@@ -120,24 +122,6 @@ void Camera::_computePerspectiveProjection(float fovy,
     mat(2, 2) = - (near + far) / (far - near);
     mat(2, 3) = 2 * near * far / (far - near);
     mat(3, 2) = -1.0;
-}
-
-void Camera::_updatePosition(vec3 &position,
-                             vec3 &velocity,
-                             vec3 &acceleration,
-                             float friction,
-                             float max_speed,
-                             float dt)
-{
-    velocity += dt * friction * acceleration;
-    float speed = velocity.norm();
-    if (speed > max_speed) {
-        // Limit velocity norm
-        velocity *= (max_speed / speed);
-    }
-
-    position += dt * velocity;
-    acceleration = vec3::ZERO;
 }
 
 void Camera::_sphericalToCartesian()
