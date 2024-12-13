@@ -6,9 +6,9 @@ using namespace std;
 int main(int argc, char **argv)
 {
     // Try 10000 iterations to test speedup
-    const Real deltaT = 1e-4;
-    const Real T = 1e-2;
-    const unsigned int outputFreq = 1;
+    const Real deltaT = 1e-3;
+    const Real T = 10;
+    const unsigned int outputFreq = 10;
 
     NbodySolver solver;
 
@@ -29,21 +29,22 @@ int main(int argc, char **argv)
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
     chrono::steady_clock::time_point end;
     unsigned int timestepCounter = 0;
-    #pragma omp parallel num_threads(8)
+    #pragma omp parallel
     {
+        #pragma omp single
+        solver.initSharedVar();
         for (Real t = 0; t < T; t += deltaT)
         {
             solver.step(deltaT);
-            if (timestepCounter % outputFreq == 0)
+            #pragma omp single
             {
-                #pragma omp single
+                if (timestepCounter % outputFreq == 0)
                 {
-                    end = chrono::steady_clock::now();
-                    cout << chrono::duration_cast<chrono::microseconds>(end - begin).count() << endl;
-                    begin = chrono::steady_clock::now();
+                    solver.outputTimestep(outFile);
+                    cout << "Timestep: " << t << endl;
                 }
+                timestepCounter++;
             }
-            timestepCounter++;
         }
     }
 
