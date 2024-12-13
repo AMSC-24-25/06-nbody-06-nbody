@@ -51,7 +51,7 @@ As a first optimization, we used a Leapfrog KDK scheme, which is second order, a
 \vec{v}_q(t+\Delta t) = \vec{v}_q(t+\frac{\Delta t}{2})+\vec{a}_q(t+\Delta t)\frac{\Delta t}{2}
 ```
 ## Parallel version
-Parallelizing using OpenMP yeilds the following results in terms of scalability
+Parallelizing using OpenMP yeilds the following results in terms of scalability (# Bodies = 100, times in µs)
 <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/scalability.png" alt="scalability">
 
 ## Results
