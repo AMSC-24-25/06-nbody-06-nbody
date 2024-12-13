@@ -50,6 +50,9 @@ As a first optimization, we used a Leapfrog KDK scheme, which is second order, a
 ```math
 \vec{v}_q(t+\Delta t) = \vec{v}_q(t+\frac{\Delta t}{2})+\vec{a}_q(t+\Delta t)\frac{\Delta t}{2}
 ```
+## Parallel version
+Parallelizing using OpenMP yeilds the following results in terms of scalability
+<img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/scalability.png" alt="scalability">
 
 ## Results
 (parameters taken from [Periodic Planar Three Body Orbits](https://observablehq.com/@rreusser/periodic-planar-three-body-orbits))
