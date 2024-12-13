@@ -1,73 +1,39 @@
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 
-def plot_deltae_vs_time(file_path):
-    # Initialize containers for time and DeltaE
-    times = []
-    delta_es = []
-
+def plot_data(file_path):
+    # Open the file and read lines
     with open(file_path, 'r') as file:
         lines = file.readlines()
-        
-        # Parse the file
-        for i in range(0, len(lines), 3):  # Each block has 3 lines
-            time_line = lines[i].strip()
-            deltae_line = lines[i + 2].strip()
 
-            # Extract Time and DeltaE
-            time = float(time_line.split(':')[1].strip())
-            delta_e = float(deltae_line.split(':')[1].strip())
+    # Extract the reference value from the first line
+    first_line = lines[0].strip().split()
+    reference_value = float(first_line[1])
 
-            times.append(time)
-            delta_es.append(delta_e)
+    # Extract the x and y coordinates from the remaining lines
+    x_coords = []
+    y_coords = []
+    for line in lines[1:]:
+        x, y = map(float, line.strip().split())
+        x_coords.append(x)
+        y_coords.append(y)
 
-    # Plot DeltaE vs Time
-    plt.figure(figsize=(8, 5))
-    plt.plot(times, delta_es, marker='o', linestyle='-', color='b', label='ΔE')
-    plt.xlabel('Time (T)')
-    plt.ylabel('ΔE (Delta Energy)')
-    plt.title('Delta Energy vs Time')
+    # Create the plot
+    plt.figure(figsize=(8, 6))
+    
+    # Plot the blue line connecting the coordinates
+    plt.plot(x_coords, y_coords, color='blue', label='Energy')
+    
+    # Plot the red horizontal reference line
+    plt.axhline(y=reference_value, color='red', linestyle='--', label=f'Initial Energy (E={reference_value})')
+
+    # Add labels and title
+    plt.xlabel('Timestep')
+    plt.ylabel('Total Energy (K+U)')
+    plt.title('Energy of the system over time')
+    plt.legend()
+
+    # Show the plot
     plt.grid(True)
-    plt.legend()
-    plt.tight_layout()
-
-    # Show the plot
     plt.show()
 
-def plot_deltae_vs_time_loglog(file_path):
-    # Initialize containers for time and DeltaE
-    times = []
-    delta_es = []
-
-    with open(file_path, 'r') as file:
-        lines = file.readlines()
-        
-        # Parse the file
-        for i in range(0, len(lines), 3):  # Each block has 3 lines
-            time_line = lines[i].strip()
-            deltae_line = lines[i + 2].strip()
-
-            # Extract Time and DeltaE
-            time = float(time_line.split(':')[1].strip())
-            delta_e = float(deltae_line.split(':')[1].strip())
-
-            times.append(time)
-            delta_es.append(delta_e)
-
-    # Plot DeltaE vs Time on log-log scale
-    plt.figure(figsize=(8, 5))
-    plt.loglog(times, delta_es, marker='o', linestyle='-', color='b', label='ΔE')
-    plt.xlabel('Time (T)')
-    plt.ylabel('ΔE (Delta Energy)')
-    plt.title('Delta Energy vs Time (Log-Log Scale)')
-    plt.grid(True, which="both", linestyle="--", linewidth=0.5)
-    plt.legend()
-    plt.tight_layout()
-
-    # Show the plot
-    plt.show()
-
-# Example usage:
-file_path = 'build/energyData.txt'  # Replace with your file name
-plot_deltae_vs_time(file_path)
-plot_deltae_vs_time_loglog(file_path)
+plot_data('energyData-FE.txt')
