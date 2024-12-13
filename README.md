@@ -54,5 +54,5 @@ As a first optimization, we used a Leapfrog KDK scheme, which is second order, a
 ## Results
 (parameters taken from [Periodic Planar Three Body Orbits](https://observablehq.com/@rreusser/periodic-planar-three-body-orbits))
 
-![I.A. i.c. 1](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/solver/tests/animations/three-IA-ic-1.gif)
-![SS - LET](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/solver/tests/animations/three-sheen-LET.gif)
+![I.A. i.c. 1](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/animations/three-IA-ic-1.gif)
+![SS - LET](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/animations/three-sheen-LET.gif)
