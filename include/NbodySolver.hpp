@@ -56,31 +56,10 @@ public:
     void outputTimestep(std::ofstream &output_file) const;
 
     // Compute initial energy, used for error evaluation
-    inline const Real computeEnergy() const
-    {
-        Real K = 0.0;
-        // Kinetic component
-        for (const auto &body : bodies)
-        {
-            K += 0.5 * body.getMass() * pow(body.getVelocity().norm(), 2.0);
-        }
+    const Real computeEnergy() const;
 
-        Real U = 0.0;
-        // Potential component
-        for (int q = 0; q < bodies.size(); q++)
-        {
-            for (int p = q + 1; p < bodies.size(); p++)
-            {
-                U += -G * bodies[p].getMass() * bodies[q].getMass() / ((bodies[q].getPosition() - bodies[p].getPosition()).norm());
-            }
-        }
-
-        return K + U;
-    }
-
-    void initSharedVar(){
-        forces.resize(omp_get_num_threads(), std::vector<Vector<Real, dim>>(numBodies));
-    }
+    //Initialize the forces vector used by the OpenMP processes
+    void initSharedVar();
 };
 
 #endif
