@@ -16,11 +16,12 @@ void writePositionsToFile(const std::vector<Body<T, 2>> &bodies, int timestep, s
     // Write timestep marker
     outFile << "# Timestep " << timestep << "\n";
 
-    // Write positions
+    // Write positions and energy of each body
     for (size_t i = 0; i < bodies.size(); ++i)
     {
         const auto &pos = bodies[i].getPosition();
-        outFile << i << "\t" << pos[0] << "\t" << pos[1] << "\n";
+        const auto energy = bodies[i].getEnergy();
+        outFile << i << "\t" << pos[0] << "\t" << pos[1] << "\t" << energy << "\n";
     }
     outFile << "\n"; // Empty line between timesteps for easier parsing
 }
@@ -29,12 +30,12 @@ int main()
 {
     using T = double;
 
-    // Define universe bounds (50 AU in meters)
+    // Define universe bounds 
     T universeSize = 8.0;
     Vector<T, 2> origin({-universeSize / 2, -universeSize / 2});
     Quad<T> universe(origin, universeSize);
 
-    // Create solver with appropriate timestep (1 day in seconds)
+    // Create solver with appropriate timestep 
     T timeStep = 1e-4;
     NBodyBHSolver<T> solver(universe, timeStep);
 
@@ -84,7 +85,7 @@ int main()
     outFile << "# Format: ParticleID\tX\tY\n";
     outFile << "# Number of particles: " << numParticles << "\n\n";
 
-    // Run simulation
+    // Run simulation for 100s (also see 1000s with timestep 1e-4)
     const int numSteps = 1000000;
     std::cout << "Starting simulation with " << numParticles << " particles for " << numSteps << " steps\n";
 
@@ -96,8 +97,8 @@ int main()
     {
         solver.simulateOneStep();
 
-        // Write positions every 10000 steps
-        if (step % 2000 == 0)
+        // Write positions every 0.1s
+        if (step % 1000 == 0)
         {
             writePositionsToFile(solver.getBodies(), step, outFile);
             std::cout << "Completed step " << step << "/" << numSteps << "\n";

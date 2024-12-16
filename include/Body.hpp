@@ -3,27 +3,39 @@
 #include <Vector.hpp>
 
 typedef double massT;
+typedef double energyT;
 
 template <typename T, int N>
 class Body
 {
 private:
     massT mass;
+    energyT energy;
     Vector<T, N> pos;
     Vector<T, N> vel;
     Vector<T, N> acc;
 
 public:
     Body(const massT &mass_init, const std::initializer_list<T> &pos_init, const std::initializer_list<T> &vel_init) : mass(mass_init),
-                                                                                                                      pos(pos_init),
-                                                                                                                      vel(vel_init) {}
+                                                                                                                       pos(pos_init),
+                                                                                                                       vel(vel_init) {}
     Body(const massT &mass_init, const Vector<T, N> &pos_init, const Vector<T, N> &vel_init) : mass(mass_init),
-                                                                                            pos(pos_init),
-                                                                                            vel(vel_init) {}
+                                                                                               pos(pos_init),
+                                                                                               vel(vel_init) {}
 
     const massT getMass() const
     {
         return mass;
+    }
+
+    const energyT getEnergy() const
+    {
+        return energy;
+    }
+
+    void setEnergy(const energyT &newEnergy)
+    {
+        energy = newEnergy;
     }
 
     const Vector<T, N> &getPosition() const

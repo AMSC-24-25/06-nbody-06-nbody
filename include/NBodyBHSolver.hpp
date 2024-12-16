@@ -85,6 +85,25 @@ public:
             Vector<T, 2> deltaVel = body.getAcceleration() * timeStep * 0.5;
             body.updateVelocity(deltaVel);
         }
+
+        // Calculate energy of each body
+        for (Body<T, 2> &body : bodies)
+        {
+            T newKineticEnergy = 0.5 * body.getMass() * body.getVelocity().norm() * body.getVelocity().norm();
+            T newPotentialEnergy = 0.0;
+            for (Body<T, 2> &other : bodies)
+            {
+                if (&body != &other)
+                {
+                    Vector<T, 2> r = body.getPosition() - other.getPosition();
+                    newPotentialEnergy -= body.getMass() * other.getMass() / r.norm();
+                }
+            }
+            // Total energy is the sum of kinetic and potential energy, divide by 2 to avoid double counting
+            // This should be right because when we add them together, we just get original potential energy
+            T newEnergy = newKineticEnergy + newPotentialEnergy / 2.0; 
+            body.setEnergy(newEnergy);
+        }
     }
 
     const std::vector<Body<T, 2>> &getBodies() const
