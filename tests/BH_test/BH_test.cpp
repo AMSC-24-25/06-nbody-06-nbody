@@ -30,13 +30,13 @@ int main()
 {
     using T = double;
 
-    // Define universe bounds 
+    // Define universe bounds
     T universeSize = 8.0;
     Vector<T, 2> origin({-universeSize / 2, -universeSize / 2});
     Quad<T> universe(origin, universeSize);
 
-    // Create solver with appropriate timestep 
-    T timeStep = 1e-4;
+    // Create solver with appropriate timestep
+    T timeStep = 1e-2;
     NBodyBHSolver<T> solver(universe, timeStep);
 
     // Planet data: mass (kg), distance from sun (m), orbital velocity (m/s)
@@ -62,6 +62,12 @@ int main()
         {"B", 1.0, 1.0, 0.0, 0.6150407229, 0.5226158545},
         {"C", 1.0, 0.0, 0.0, -2 * 0.6150407229, -2 * 0.5226158545}};
 
+    // This is I.A_2^{i.c} test case (with collision)
+    // std::vector<PlanetData> planets = {
+    //     {"A", 1.0, -1.0, 0.0, 0.3068934205, 0.1255065670},
+    //     {"B", 1.0, 1.0, 0.0, 0.3068934205, 0.1255065670},
+    //     {"C", 1.0, 0.0, 0.0, -2 * 0.3068934205, -2 * 0.1255065670}};
+
     // Add bodies to the simulation
     for (const auto &planet : planets)
     {
@@ -86,19 +92,21 @@ int main()
     outFile << "# Number of particles: " << numParticles << "\n\n";
 
     // Run simulation for 100s (also see 1000s with timestep 1e-4)
-    const int numSteps = 1000000;
+    const int numSteps = 100000;
     std::cout << "Starting simulation with " << numParticles << " particles for " << numSteps << " steps\n";
 
     // Write initial positions
+    solver.calculateEnergy();
     writePositionsToFile(solver.getBodies(), 0, outFile);
 
     // Simulation loop
     for (int step = 1; step <= numSteps; ++step)
     {
         solver.simulateOneStep();
+        solver.calculateEnergy();
 
         // Write positions every 0.1s
-        if (step % 1000 == 0)
+        if (step % 10 == 0)
         {
             writePositionsToFile(solver.getBodies(), step, outFile);
             std::cout << "Completed step " << step << "/" << numSteps << "\n";

@@ -1,95 +1,64 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import re
 
-def read_energy_data(filename):
-    """Read particle energy data from file and return timesteps and total energies."""
+def read_and_plot_energies(filename):
     timesteps = []
     total_energies = []
-    current_energies = []
     
     with open(filename, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith('# Format'):
+        lines = f.readlines()
+        
+    current_sum = 0
+    energy_count = 0
+    
+    for line in lines:
+        if line.startswith('# Timestep'):
+            if energy_count > 0:
+                timesteps.append(current_timestep)
+                total_energies.append(current_sum)
+            current_timestep = int(line.split()[2])
+            current_sum = 0
+            energy_count = 0
+        elif not line.startswith('#') and line.strip():
+            try:
+                energy = float(line.strip().split()[3])
+                current_sum += energy
+                energy_count += 1
+            except (ValueError, IndexError):
                 continue
-                
-            # Check for timestep header
-            timestep_match = re.search(r'# Timestep (\d+)', line)
-            if timestep_match:
-                if current_energies:
-                    total_energies.append(sum(current_energies))
-                    current_energies = []
-                timesteps.append(int(timestep_match.group(1)))
-                continue
-            
-            # Parse particle data if it's not a comment line
-            if not line.startswith('#'):
-                try:
-                    parts = line.split()
-                    if len(parts) == 4:  # ParticleID, X, Y, E
-                        energy = float(parts[3])
-                        current_energies.append(energy)
-                except ValueError:
-                    continue
     
-    # Don't forget to add the last timestep
-    if current_energies:
-        total_energies.append(sum(current_energies))
+    # Add the last timestep
+    if energy_count > 0:
+        timesteps.append(current_timestep)
+        total_energies.append(current_sum)
     
-    return np.array(timesteps), np.array(total_energies)
-
-def save_energy_plot(filename, annotation_stride=1000, y_margin=0.01):
-    """Create and save an energy plot with zoomed y-axis and selective annotations."""
-    # Read the data
-    timesteps, total_energies = read_energy_data(filename)
+    # Create plot
+    plt.figure(figsize=(12, 6))
     
-    # Create the plot with a white background
-    plt.figure(figsize=(12, 8))
-    plt.style.use('default')
+    # Plot with connected lines
+    plt.plot(timesteps, total_energies, '-b', linewidth=1)
     
-    # Plot with line
-    plt.plot(timesteps, total_energies, '-', 
-             linewidth=1.5, 
-             color='blue',
-             label='Total Energy',
-             alpha=0.8)
+    # Set y-axis ticks at 0.1 intervals
+    min_energy = min(total_energies)
+    max_energy = max(total_energies)
+    yticks = np.arange(np.floor(min_energy*10)/10, np.ceil(max_energy*10)/10 + 0.1, 5.0)
+    plt.yticks(yticks)
     
-    # Add annotations at strided intervals
-    for i in range(0, len(timesteps), annotation_stride):
-        plt.annotate(f'{total_energies[i]:.6f}', 
-                    (timesteps[i], total_energies[i]),
-                    xytext=(0, 10), 
-                    textcoords='offset points',
-                    ha='center',
-                    va='bottom',
-                    fontsize=8,
-                    rotation=45)
+    plt.xlabel('Timestep')
+    plt.ylabel('Total Energy')
+    plt.title('Total System Energy (Delta T = e-2)')
+    plt.grid(True, alpha=0.3)
     
-    # Calculate y-axis limits with margin
-    y_min = np.min(total_energies)
-    y_max = np.max(total_energies)
-    y_range = y_max - y_min
-    plt.ylim([y_min - y_range * y_margin, y_max + y_range * y_margin])
+    # Format axes
+    plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))  # Scientific notation for x-axis only
+    plt.ticklabel_format(useOffset=False, axis='y')  # No offset for y-axis
     
-    # Customize the plot
-    plt.xlabel('Timestep', fontsize=12)
-    plt.ylabel('Total Energy', fontsize=12)
-    plt.title('Total System Energy', fontsize=14)
-    plt.grid(True, linestyle='--', alpha=0.3)
+    # Print some values to verify
+    print(f"First few values:")
+    for i in range(min(5, len(timesteps))):
+        print(f"Timestep {timesteps[i]}: {total_energies[i]}")
     
-    # Format x-axis to use scientific notation
-    plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
-    
-    plt.legend()
-    plt.margins(x=0.02)  # Reduce margins
-    plt.tight_layout()
-    
-    # Save the plot
-    plt.savefig('energy_plot.png', dpi=300, bbox_inches='tight')
+    plt.savefig('energy_evolution.png', dpi=300, bbox_inches='tight')
     plt.close()
 
-if __name__ == "__main__":
-    # Adjust annotation_stride to control how often values are shown
-    # Adjust y_margin to control zoom level (smaller value = more zoom)
-    save_energy_plot("particle_positions.txt", annotation_stride=100, y_margin=0.1)
+read_and_plot_energies('particle_positions.txt')
