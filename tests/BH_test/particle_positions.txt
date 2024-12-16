@@ -1,4 +1,4 @@
-# Format: ParticleID	X	Y
+# Format: ParticleID	X	Y   E
 # Number of particles: 3
 
 # Timestep 0
