@@ -36,7 +36,7 @@ int main()
     Quad<T> universe(origin, universeSize);
 
     // Create solver with appropriate timestep
-    T timeStep = 1e-2;
+    T timeStep = 1e-4;
     NBodyBHSolver<T> solver(universe, timeStep);
 
     // Planet data: mass (kg), distance from sun (m), orbital velocity (m/s)
@@ -88,11 +88,11 @@ int main()
     const int numParticles = planets.size();
 
     // Write header
-    outFile << "# Format: ParticleID\tX\tY\n";
+    outFile << "# Format: ParticleID\tX\tY\tE\n";
     outFile << "# Number of particles: " << numParticles << "\n\n";
 
     // Run simulation for 100s (also see 1000s with timestep 1e-4)
-    const int numSteps = 100000;
+    const int numSteps = 1000000;
     std::cout << "Starting simulation with " << numParticles << " particles for " << numSteps << " steps\n";
 
     // Write initial positions
@@ -105,8 +105,8 @@ int main()
         solver.simulateOneStep();
         solver.calculateEnergy();
 
-        // Write positions every 0.1s
-        if (step % 10 == 0)
+        // Write positions every 0.2s
+        if (step % 2000 == 0)
         {
             writePositionsToFile(solver.getBodies(), step, outFile);
             std::cout << "Completed step " << step << "/" << numSteps << "\n";

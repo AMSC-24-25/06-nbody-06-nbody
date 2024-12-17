@@ -41,12 +41,12 @@ def read_and_plot_energies(filename):
     # Set y-axis ticks at 0.1 intervals
     min_energy = min(total_energies)
     max_energy = max(total_energies)
-    yticks = np.arange(np.floor(min_energy*10)/10, np.ceil(max_energy*10)/10 + 0.1, 5.0)
+    yticks = np.arange(np.floor(min_energy*10)/10, np.ceil(max_energy*10)/10 + 0.1, 0.1)
     plt.yticks(yticks)
     
     plt.xlabel('Timestep')
     plt.ylabel('Total Energy')
-    plt.title('Total System Energy (Delta T = e-2)')
+    plt.title('Total System Energy vs. Timestep')
     plt.grid(True, alpha=0.3)
     
     # Format axes
