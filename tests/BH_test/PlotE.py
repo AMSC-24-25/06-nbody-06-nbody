@@ -38,10 +38,12 @@ def read_and_plot_energies(filename):
     # Plot with connected lines
     plt.plot(timesteps, total_energies, '-b', linewidth=1)
     
-    # Set y-axis ticks at 0.1 intervals
+    # Set fewer y-axis ticks to avoid overlapping
     min_energy = min(total_energies)
     max_energy = max(total_energies)
-    yticks = np.arange(np.floor(min_energy*10)/10, np.ceil(max_energy*10)/10 + 0.1, 0.1)
+    # Reduce number of ticks by increasing the interval
+    num_ticks = 8  # Adjust this number to control density of y-axis labels
+    yticks = np.linspace(min_energy, max_energy, num_ticks)
     plt.yticks(yticks)
     
     plt.xlabel('Timestep')

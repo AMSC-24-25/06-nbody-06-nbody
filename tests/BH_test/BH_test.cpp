@@ -31,12 +31,12 @@ int main()
     using T = double;
 
     // Define universe bounds
-    T universeSize = 8.0;
+    T universeSize = 3.0;
     Vector<T, 2> origin({-universeSize / 2, -universeSize / 2});
     Quad<T> universe(origin, universeSize);
 
     // Create solver with appropriate timestep
-    T timeStep = 1e-4;
+    T timeStep = 1e-2;
     NBodyBHSolver<T> solver(universe, timeStep);
 
     // Planet data: mass (kg), distance from sun (m), orbital velocity (m/s)
@@ -51,16 +51,16 @@ int main()
     };
 
     // Use data from https://numericaltank.sjtu.edu.cn/three-body/three-body-movies.htm
-    // std::vector<PlanetData> planets = {
-    //     {"A", 1.0, -1.0, 0.0, 0.3471168881, 0.5327249454},
-    //     {"B", 1.0, 1.0, 0.0, 0.3471168881, 0.5327249454},
-    //     {"C", 1.0, 0.0, 0.0, -2 * 0.3471168881, -2 * 0.5327249454}};
+    std::vector<PlanetData> planets = {
+        {"A", 1.0, -1.0, 0.0, 0.3471168881, 0.5327249454},
+        {"B", 1.0, 1.0, 0.0, 0.3471168881, 0.5327249454},
+        {"C", 1.0, 0.0, 0.0, -2 * 0.3471168881, -2 * 0.5327249454}};
 
     // This is I.A_3^{i.c} test case
-    std::vector<PlanetData> planets = {
-        {"A", 1.0, -1.0, 0.0, 0.6150407229, 0.5226158545},
-        {"B", 1.0, 1.0, 0.0, 0.6150407229, 0.5226158545},
-        {"C", 1.0, 0.0, 0.0, -2 * 0.6150407229, -2 * 0.5226158545}};
+    // std::vector<PlanetData> planets = {
+    //     {"A", 1.0, -1.0, 0.0, 0.6150407229, 0.5226158545},
+    //     {"B", 1.0, 1.0, 0.0, 0.6150407229, 0.5226158545},
+    //     {"C", 1.0, 0.0, 0.0, -2 * 0.6150407229, -2 * 0.5226158545}};
 
     // This is I.A_2^{i.c} test case (with collision)
     // std::vector<PlanetData> planets = {
@@ -92,7 +92,7 @@ int main()
     outFile << "# Number of particles: " << numParticles << "\n\n";
 
     // Run simulation for 100s (also see 1000s with timestep 1e-4)
-    const int numSteps = 1000000;
+    const int numSteps = 10000;
     std::cout << "Starting simulation with " << numParticles << " particles for " << numSteps << " steps\n";
 
     // Write initial positions
@@ -105,8 +105,8 @@ int main()
         solver.simulateOneStep();
         solver.calculateEnergy();
 
-        // Write positions every 0.2s
-        if (step % 2000 == 0)
+        // Write positions every 0.25s
+        if (step % 25 == 0)
         {
             writePositionsToFile(solver.getBodies(), step, outFile);
             std::cout << "Completed step " << step << "/" << numSteps << "\n";
