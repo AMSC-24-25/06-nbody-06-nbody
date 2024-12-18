@@ -66,5 +66,4 @@ def animate_particles(file_path, fig_size=(5, 5)):
     plt.show()
     
 # Example usage:
-file_path = 'bodyData.txt'  # Replace with your file name
-animate_particles(file_path, fig_size=(5, 5))
+animate_particles('bodyData.txt', fig_size=(5, 5))

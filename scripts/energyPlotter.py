@@ -36,4 +36,4 @@ def plot_data(file_path):
     plt.grid(True)
     plt.show()
 
-plot_data('energyData-FE.txt')
+plot_data('energyData.txt')

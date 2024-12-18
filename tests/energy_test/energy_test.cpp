@@ -4,9 +4,9 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-    const Real deltaT = 1e-6;
-    const Real T = 10;
-    const unsigned int outputFreq = 10;
+    const Real deltaT = 1e-4;
+    const Real T = 5;
+    const unsigned int outputFreq = 1;
 
     NbodySolver solver;
 

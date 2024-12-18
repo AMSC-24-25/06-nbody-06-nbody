@@ -6,7 +6,7 @@ using namespace std;
 int main(int argc, char **argv)
 {
     // Try 10000 iterations to test speedup
-    const Real deltaT = 1e-3;
+    const Real deltaT = 1e-4;
     const Real T = 10;
     const unsigned int outputFreq = 10;
 
