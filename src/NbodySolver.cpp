@@ -46,22 +46,11 @@ void NbodySolver::step(const Real &deltaT)
             // Reset the vector for the next iteration
             forces[i][q] = Vector<Real, dim>();
         }
-        // Forward euler integrator
-        // bodies[q].updatePosition(bodies[q].getVelocity()*deltaT);
-        // bodies[q].updateVelocity(bodies[q].getAcceleration()*deltaT);
-        // bodies[q].setAcceleration(totForce / bodies[q].getMass());
 
-        // Leapfrog KDK integrator
-        // bodies[q].updateVelocity(0.5 * bodies[q].getAcceleration() * deltaT);
-        // bodies[q].updatePosition(bodies[q].getVelocity() * deltaT);
-        // bodies[q].setAcceleration(totForce / bodies[q].getMass());
-        // bodies[q].updateVelocity(0.5 * bodies[q].getAcceleration() * deltaT);
-
-        // Verlet intergrator
-        bodies[q].updatePosition(bodies[q].getVelocity()*deltaT+bodies[q].getAcceleration()*deltaT*deltaT*0.5);
-        Vector<Real,dim> oldAcc = bodies[q].getAcceleration();
+        // Leapfrog integrator
         bodies[q].setAcceleration(totForce / bodies[q].getMass());
-        bodies[q].updateVelocity((bodies[q].getAcceleration()+oldAcc)*(deltaT*0.5));     
+        bodies[q].updateVelocity(bodies[q].getAcceleration() * deltaT);
+        bodies[q].updatePosition(bodies[q].getVelocity() * deltaT);
     }
 }
 
@@ -97,7 +86,7 @@ const Real NbodySolver::computeEnergy() const
     return K + U;
 }
 
-void NbodySolver::initSharedVar()
+void NbodySolver::initSharedVar() const
 {
     forces.resize(omp_get_num_threads(), std::vector<Vector<Real, dim>>(numBodies));
 }
