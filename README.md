@@ -50,9 +50,18 @@ As a first optimization, we used a Leapfrog KDK scheme, which is second order, a
 ```math
 \vec{v}_q(t+\Delta t) = \vec{v}_q(t+\frac{\Delta t}{2})+\vec{a}_q(t+\Delta t)\frac{\Delta t}{2}
 ```
+## Parallel version
+Parallelizing using OpenMP yeilds the following results in terms of scalability (# Bodies = 100, times in µs)
+<img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/scalability.png" alt="scalability">
 
 ## Results
 (parameters taken from [Periodic Planar Three Body Orbits](https://observablehq.com/@rreusser/periodic-planar-three-body-orbits))
+### Body animations
+| I.A. i.c. 1  | SS - LET |
+| ------------- | ------------- |
+| <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/three-IA-ic-1.gif" alt="I.A. i.c. 1"> | <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/three-sheen-LET.gif" alt="SS - LET"> |
 
-![I.A. i.c. 1](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/animations/three-IA-ic-1.gif)
-![SS - LET](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/animations/three-sheen-LET.gif)
+### Energy plots comparing the different integration methods (using the I.A. i.c. 1 configuration)
+| Forward Euler  | Leapfrog |
+| ------------- | ------------- |
+| <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/3b-10T-6dT-FE.png" alt="FE"> | <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/3b-10T-6dT-LEAP.png" alt="LEAPFROG"> |
