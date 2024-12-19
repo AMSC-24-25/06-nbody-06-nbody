@@ -29,18 +29,11 @@ private:
     }
 
 public:
-    // Manually add a body, this is used mostly for testing
-    void addBody(const massT &mass_, const Vector<Real, dim> &pos, const Vector<Real, dim> &vel)
-    {
-        Body<Real, dim> newBody(mass_, pos, vel);
-        addBody(newBody);
-    }
+    // Add body given its parameters
+    void addBody(const massT &mass_, const Vector<Real, dim> &pos, const Vector<Real, dim> &vel);
 
-    void addBody(const Body<Real, dim> &body)
-    {
-        bodies.push_back(body);
-        numBodies++;
-    }
+    // Add an existing body
+    void addBody(const Body<Real, dim> &body);
 
     // Load bodies from the file specified in the constructor
     void loadBodies(const std::string &bodies_file_name);

@@ -1,6 +1,19 @@
 #include <NbodySolver.hpp>
 #include <omp.h>
 
+
+void NbodySolver::addBody(const massT &mass_, const Vector<Real, dim> &pos, const Vector<Real, dim> &vel)
+{
+    Body<Real, dim> newBody(mass_, pos, vel);
+    addBody(newBody);
+}
+
+void NbodySolver::addBody(const Body<Real, dim> &body)
+{
+    bodies.push_back(body);
+    numBodies++;
+}
+
 void NbodySolver::loadBodies(const std::string &bodies_file_name)
 {
     bodies = IO<Real, dim>::readBodiesFromFile(bodies_file_name);
