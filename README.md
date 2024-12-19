@@ -54,6 +54,17 @@ As a first optimization, we used a Leapfrog KDK scheme, which is second order, a
 Parallelizing using OpenMP yeilds the following results in terms of scalability (# Bodies = 100, times in µs)
 <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/scalability.png" alt="scalability">
 
+## Metric for measuring error
+The total energy of the system is a widely used metric for assessing the accuracy of an n-body simulator. In an idealized n-body system (e.g., one with no external forces or energy losses due to radiation), the total energy, which is the sum of the kinetic and potential energies of all bodies, should remain constant over time according to the principle of conservation of energy.
+### Difference in $`\Delta E`$ for different choices of $`\Delta t`$
+| Forward Euler  | Leapfrog |
+| ------------- | ------------- |
+| <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/euler-order.png" alt="FE"> | <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/leapfrog-order.png" alt="LEAPFROG"> |
+### Comparison of integration schemes ($`\Delta t = 10^{-3}`$)
+
+<img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/leap-euler.png" alt="scalability">
+<img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/leap-euler-zoomed.png" alt="scalability">
+
 ## Results
 (parameters taken from [Periodic Planar Three Body Orbits](https://observablehq.com/@rreusser/periodic-planar-three-body-orbits))
 ### Body animations
@@ -61,7 +72,5 @@ Parallelizing using OpenMP yeilds the following results in terms of scalability 
 | ------------- | ------------- |
 | <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/three-IA-ic-1.gif" alt="I.A. i.c. 1"> | <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/three-sheen-LET.gif" alt="SS - LET"> |
 
-### Energy plots comparing the different integration methods (using the I.A. i.c. 1 configuration)
-| Forward Euler  | Leapfrog |
-| ------------- | ------------- |
-| <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/3b-10T-6dT-FE.png" alt="FE"> | <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/3b-10T-6dT-LEAP.png" alt="LEAPFROG"> |
+### Energy plots comparing different $`\Delta t`$ for different integration scheme
+
