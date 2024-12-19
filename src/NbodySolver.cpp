@@ -73,7 +73,7 @@ const Real NbodySolver::computeEnergy() const
     return K + U;
 }
 
-void NbodySolver::initSharedVar()
+void NbodySolver::initSharedVar() const
 {
     forces.resize(omp_get_num_threads(), std::vector<Vector<Real, dim>>(numBodies));
 }

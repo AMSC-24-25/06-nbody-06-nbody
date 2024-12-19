@@ -16,7 +16,7 @@ private:
     static constexpr Real G = 1;
     unsigned int numBodies;
     std::vector<Body<Real, dim>> bodies;
-    std::vector<std::vector<Vector<Real, dim>>> forces;
+    mutable std::vector<std::vector<Vector<Real, dim>>> forces;
 
     // Generic force term
     inline Vector<Real, dim> computeForce(const Body<Real, dim> &b1, const Body<Real, dim> &b2) const
@@ -59,7 +59,7 @@ public:
     const Real computeEnergy() const;
 
     //Initialize the forces vector used by the OpenMP processes
-    void initSharedVar();
+    void initSharedVar() const;
 };
 
 #endif
