@@ -5,7 +5,7 @@ using namespace std;
 int main(int argc, char **argv)
 {
     const Real deltaT = 1e-4;
-    const Real T = 5;
+    const Real T = 50;
     const unsigned int outputFreq = 1;
 
     NbodySolver solver;
