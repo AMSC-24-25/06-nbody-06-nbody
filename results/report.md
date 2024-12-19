@@ -50,9 +50,6 @@ As a first optimization, we used a Leapfrog KDK scheme, which is second order, a
 ```math
 \vec{v}_q(t+\Delta t) = \vec{v}_q(t+\frac{\Delta t}{2})+\vec{a}_q(t+\Delta t)\frac{\Delta t}{2}
 ```
-## Parallel version
-Parallelizing using OpenMP yeilds the following results in terms of scalability (# Bodies = 100, times in µs)
-<img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/scalability.png" alt="scalability">
 
 ## Metric for measuring error
 The total energy of the system is a widely used metric for assessing the accuracy of an n-body simulator. In an idealized n-body system (e.g., one with no external forces or energy losses due to radiation), the total energy, which is the sum of the kinetic and potential energies of all bodies, should remain constant over time according to the principle of conservation of energy.
@@ -65,12 +62,15 @@ The total energy of the system is a widely used metric for assessing the accurac
 <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/leap-euler.png" alt="scalability">
 <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/leap-euler-zoomed.png" alt="scalability">
 
-## Results
-(parameters taken from [Periodic Planar Three Body Orbits](https://observablehq.com/@rreusser/periodic-planar-three-body-orbits))
-### Body animations
-| I.A. i.c. 1  | SS - LET |
+The difference between the two methods in terms of $`\Delta E`$ have a significant effect on the accuracy of the simulation, as shown here ($`\Delta t=10^{-4},\ T=10`$, figure-8 configuration [1])
+| Forward Euler  | Leapfrog |
 | ------------- | ------------- |
-| <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/three-IA-ic-1.gif" alt="I.A. i.c. 1"> | <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/three-sheen-LET.gif" alt="SS - LET"> |
+| <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/8euler-animation.gif" alt="FE"> | <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/8leapfrog-animation.gif" alt="LEAPFROG"> |
 
-### Energy plots comparing different $`\Delta t`$ for different integration scheme
+## Parallel version
+Parallelizing using OpenMP yeilds the following results in terms of scalability (# Bodies = 100, times in µs)
+<img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/scalability.png" alt="scalability">
+
+## References
+[[1] Periodic Planar Three Body Orbits](https://observablehq.com/@rreusser/periodic-planar-three-body-orbits)
 
