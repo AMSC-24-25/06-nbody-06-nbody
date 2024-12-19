@@ -40,7 +40,7 @@ Using Newton's third law, we can halve the amount of forces computed, since
 ### Better integration Scheme
 The Forward Euler scheme, being first-order, performs bad in terms of accuracy when the $`\Delta t`$ is not extremely small. 
 It's therefore crucial to choose a better integration scheme for the computation of the velocities and positions.<br />
-As a first optimization, we used a Leapfrog KDK scheme, which is second order, and is composed as follows:
+As a first optimization, we used a Leapfrog KDK scheme [2], which is second order, and is composed as follows:
 ```math
 \vec{v}_q(t+\frac{\Delta t}{2}) = \vec{v}_q(t)+\vec{a}_q(t)\frac{\Delta t}{2}
 ```
@@ -52,7 +52,7 @@ As a first optimization, we used a Leapfrog KDK scheme, which is second order, a
 ```
 
 ## Metric for measuring error
-The total energy of the system is a widely used metric for assessing the accuracy of an n-body simulator. In an idealized n-body system (e.g., one with no external forces or energy losses due to radiation), the total energy, which is the sum of the kinetic and potential energies of all bodies, should remain constant over time according to the principle of conservation of energy.
+The total energy of the system is a widely used metric for assessing the accuracy of an n-body simulator [3]. In an idealized n-body system (e.g., one with no external forces or energy losses due to radiation), the total energy, which is the sum of the kinetic and potential energies of all bodies, should remain constant over time according to the principle of conservation of energy.
 ### Difference in $`\Delta E`$ for different choices of $`\Delta t`$
 | Forward Euler  | Leapfrog |
 | ------------- | ------------- |
@@ -72,5 +72,6 @@ Parallelizing using OpenMP yeilds the following results in terms of scalability 
 <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/scalability.png" alt="scalability">
 
 ## References
-[[1] Periodic Planar Three Body Orbits](https://observablehq.com/@rreusser/periodic-planar-three-body-orbits)
-
+[[1] Periodic Planar Three Body Orbits](https://observablehq.com/@rreusser/periodic-planar-three-body-orbits)<br/>
+[[2] Leapfrog (Wikipedia)](https://en.m.wikipedia.org/wiki/Leapfrog_integration#)<br/>
+[[3] The kinds of errors made in N-body simulations](https://www.cs.toronto.edu/~wayne/research/thesis/msc/node5.html)<br/>
