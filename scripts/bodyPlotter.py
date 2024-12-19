@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
+
 def animate_particles(file_path, fig_size=(5, 5)):
     # Initialize containers for data
     particle_positions = {}
@@ -8,14 +9,14 @@ def animate_particles(file_path, fig_size=(5, 5)):
 
     with open(file_path, 'r') as file:
         lines = file.readlines()
-        
+
         # Read number of particles
         num_particles = int(lines[0].strip())
-        
+
         # Read masses of particles
         for i in range(1, num_particles + 1):
             particle_masses.append(float(lines[i].strip()))
-        
+
         # Read positions for each particle
         position_lines = lines[num_particles + 1:]
         for i in range(num_particles):
@@ -43,27 +44,31 @@ def animate_particles(file_path, fig_size=(5, 5)):
     particle_trajectories = []
 
     for i in range(num_particles):
-        marker, = ax.plot([], [], marker='o', label=f'Particle {i + 1} (Mass: {particle_masses[i]:.2f})')
+        marker, = ax.plot(
+            [], [], marker='o', label=f'Particle {i + 1} (Mass: {particle_masses[i]:.2f})')
         trajectory, = ax.plot([], [], linestyle='--', alpha=0.5)
         particle_markers.append(marker)
         particle_trajectories.append(trajectory)
 
-
     # Update function for animation
+
     def update(frame):
         for i in range(num_particles):
             # Update position and trajectory
             x_vals, y_vals = particle_positions[i]
             particle_markers[i].set_data([x_vals[frame]], [y_vals[frame]])
-            particle_trajectories[i].set_data(x_vals[:frame + 1], y_vals[:frame + 1])
+            particle_trajectories[i].set_data(
+                x_vals[:frame + 1], y_vals[:frame + 1])
         return particle_markers + particle_trajectories
 
     # Create the animation
     frames = min(len(particle_positions[i][0]) for i in range(num_particles))
-    ani = FuncAnimation(fig, update, frames=frames, interval=1, blit=False)
+    ani = FuncAnimation(fig, update, frames=frames,
+                        interval=50, blit=False, repeat=False)
 
     # Show the animation
     plt.show()
-    
+
+
 # Example usage:
 animate_particles('bodyData.txt', fig_size=(5, 5))
