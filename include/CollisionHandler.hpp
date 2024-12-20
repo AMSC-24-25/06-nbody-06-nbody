@@ -9,10 +9,11 @@ template <typename T>
 class CollisionHandler
 {
 private:
-    static constexpr T COLLISION_DISTANCE = 1e-6;
+    static constexpr T COLLISION_DISTANCE = 1e-4;
     static constexpr T EPSILON = 1e-8;
     static constexpr T RESTITUTION = 1.0; // Slightly inelastic collisions (ideal elastic here)
 
+    // https://en.wikipedia.org/wiki/Inelastic_collision
     static std::optional<T> getCollisionTime(const Body<T, 2> &body1, const Body<T, 2> &body2, T timeStep)
     {
         Vector<T, 2> r = body1.getPosition() - body2.getPosition();
@@ -43,7 +44,7 @@ private:
         Vector<T, 2> v2 = body2.getVelocity();
         Vector<T, 2> r = body1.getPosition() - body2.getPosition();
 
-        // Normalize collision normal
+        // Normalize collision normal for following projection usage
         r = r / r.norm();
 
         // Project velocities onto collision normal
