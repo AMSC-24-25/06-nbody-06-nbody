@@ -71,8 +71,8 @@ The difference between the two methods in terms of $`\Delta E`$ have a significa
 Parallelizing using OpenMP yeilds the following results in terms of scalability (# Bodies = 100, times in µs)
 <img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/scalability.png" alt="scalability">
 
-## 20 Bodies
-<img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/20bodies.gif" alt="20bodies">
+## 50 Bodies
+<img src="https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/20bodies.gif" alt="50bodies">
 
 ## References
 [[1] Periodic Planar Three Body Orbits](https://observablehq.com/@rreusser/periodic-planar-three-body-orbits)<br/>
