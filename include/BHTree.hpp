@@ -151,8 +151,8 @@ public:
         T distance = r.norm();
 
         // Add check for minimum distance to prevent division by zero or instability
-        if (distance < 1e-32)
-            distance = 1e-32; // Avoid extremely small distances, maybe there exists a better way
+        if (distance < 1e-5)
+            distance = 1e-5; // Avoid extremely small distances, maybe there exists a better way
 
         // Use softened force calculation (now using EPSILON = 0)
         T softenedDistance = std::sqrt(distance * distance + EPSILON * EPSILON);
