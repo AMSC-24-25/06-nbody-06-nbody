@@ -80,6 +80,16 @@ public:
         return (1.0 / scalar) * rhs;
     }
 
+    inline T dot(const Vector &rhs) const
+    {
+        T result = 0;
+        for (int i = 0; i < N; i++)
+        {
+            result += comps[i] * rhs[i];
+        }
+        return result;
+    }
+
     // WARNING: THIS IS DANGEROUS WHEN WORKING WITH FLOATS AND DOUBLES
     inline friend bool operator==(const Vector &lhs, const Vector &rhs)
     {
