@@ -19,9 +19,8 @@ def read_particle_data(filename):
                     timesteps[current_timestep] = []
                 continue
             try:
-                # Split the line and take only first 3 values (ID, X, Y)
                 values = line.strip().split()
-                particle_id, x, y = map(float, values[:3])  # Only take first 3 values
+                particle_id, x, y = map(float, values[:3])
                 timesteps[current_timestep].append([x, y])
             except ValueError:
                 continue
@@ -45,8 +44,11 @@ def setup_plot():
         "#bcbd22",
     ]
     plt.style.use("dark_background")
-    fig, ax = plt.subplots(figsize=(10, 10), facecolor="black")
+    fig, ax = plt.subplots(figsize=(12, 4), facecolor="black")
     ax.set_facecolor("black")
+    ax.yaxis.set_major_formatter(plt.FormatStrFormatter("%.2f"))
+    ax.xaxis.set_major_formatter(plt.FormatStrFormatter("%.1f"))
+    ax.tick_params(axis="both", which="major", labelsize=10, direction="out", length=6)
     return fig, ax, colors
 
 
@@ -55,8 +57,18 @@ def plot_frame(ax, positions, particle_trajectories, colors, frame, limits):
     ax.set_facecolor("black")
     ax.set_xlim(limits[0], limits[1])
     ax.set_ylim(limits[2], limits[3])
+
+    # Set aspect ratio to match reference image
+    ax.set_aspect((limits[1] - limits[0]) / (limits[3] - limits[2]) * 0.333)
+
+    # Set major tick intervals based on data range
+    x_range = limits[1] - limits[0]
+    y_range = limits[3] - limits[2]
+    ax.xaxis.set_major_locator(plt.MultipleLocator(x_range / 6))
+    ax.yaxis.set_major_locator(plt.MultipleLocator(y_range / 8))
+
     ax.grid(True, linestyle="--", alpha=0.2, color="gray")
-    ax.set_xlabel("X Position", color="white")
+    ax.set_xlabel("x", color="white")
     ax.set_ylabel("Y Position", color="white")
 
     for i, pos in enumerate(positions):
@@ -85,7 +97,6 @@ def plot_frame(ax, positions, particle_trajectories, colors, frame, limits):
     ax.set_title(f"Particle Positions - Timestep {frame}", color="white", pad=20)
     legend = ax.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
     plt.setp(legend.get_texts(), color="white")
-    ax.set_aspect("equal")
     ax.tick_params(colors="white")
     for spine in ax.spines.values():
         spine.set_color("white")
@@ -96,12 +107,28 @@ def save_visualization(filename, fps=20, interval=800):
     if not timesteps:
         return
 
-    # Calculate plot limits
+    # Calculate plot limits with appropriate ratio
     all_positions = np.concatenate([pos for pos in timesteps.values()])
-    margin = 2
-    x_min, y_min = all_positions.min(axis=0) - margin
-    x_max, y_max = all_positions.max(axis=0) + margin
-    limits = [x_min, x_max, y_min, y_max]
+    margin = 0.1
+    x_min, y_min = all_positions.min(axis=0)
+    x_max, y_max = all_positions.max(axis=0)
+    x_range = x_max - x_min
+    y_range = y_max - y_min
+
+    # Adjust x limits to maintain desired aspect ratio
+    target_ratio = 3.0  # Width should be 3x the height
+    current_ratio = x_range / y_range
+    if current_ratio < target_ratio:
+        extra_x = (target_ratio * y_range - x_range) / 2
+        x_min -= extra_x
+        x_max += extra_x
+
+    limits = [
+        x_min - margin * x_range,
+        x_max + margin * x_range,
+        y_min - margin * y_range,
+        y_max + margin * y_range,
+    ]
 
     # Create animation
     fig, ax, colors = setup_plot()
