@@ -32,8 +32,10 @@ def animate_particles(file_path, fig_size=(5, 5)):
     fig, ax = plt.subplots(figsize=fig_size)
     all_x = [x for pos in particle_positions.values() for x in pos[0]]
     all_y = [y for pos in particle_positions.values() for y in pos[1]]
-    ax.set_xlim(min(all_x) - 1, max(all_x) + 1)
-    ax.set_ylim(min(all_y) - 1, max(all_y) + 1)
+    # ax.set_xlim(min(all_x) - 1, max(all_x) + 1)
+    # ax.set_ylim(min(all_y) - 1, max(all_y) + 1)
+    ax.set_xlim(-30, 30)
+    ax.set_ylim(-30, 30)
     ax.set_aspect('equal')  # Ensure equal scaling of x and y axes
     ax.set_xlabel('X Coordinate')
     ax.set_ylabel('Y Coordinate')
@@ -64,7 +66,7 @@ def animate_particles(file_path, fig_size=(5, 5)):
     # Create the animation
     frames = min(len(particle_positions[i][0]) for i in range(num_particles))
     ani = FuncAnimation(fig, update, frames=frames,
-                        interval=50, blit=False, repeat=False)
+                        interval=25, blit=False, repeat=False)
 
     # Show the animation
     plt.show()

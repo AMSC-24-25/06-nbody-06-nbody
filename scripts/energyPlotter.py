@@ -41,4 +41,4 @@ def plot_multiple_data(file_paths):
     plt.show()
 
 # Replace ['file1.txt', 'file2.txt'] with the paths to your files
-plot_multiple_data(['energyData-3eul1000.txt','energyData-3leap1000.txt'])
+plot_multiple_data(['energyData.txt'])
