@@ -1,7 +1,10 @@
 ﻿  Compiling CUDA source file nbody_cuda_leapfrog.cu...
   
   C:\Users\qzc20\source\repos\CudaRuntime1\CudaRuntime1>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\bin\nvcc.exe" -gencode=arch=compute_52,code=\"sm_52,compute_52\" --use-local-env -ccbin "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\bin\HostX64\x64" -x cu   -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\include"  -G   --keep-dir x64\Debug  -maxrregcount=0   --machine 64 --compile -cudart static  -g  -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /FS /Zi /RTC1 /MDd " -Xcompiler "/Fdx64\Debug\vc143.pdb" -o C:\Users\qzc20\source\repos\CudaRuntime1\CudaRuntime1\x64\Debug\nbody_cuda_leapfrog.cu.obj "C:\Users\qzc20\source\repos\CudaRuntime1\CudaRuntime1\nbody_cuda_leapfrog.cu" 
+C:\Users\qzc20\source\repos\CudaRuntime1\CudaRuntime1\IO.hpp(58): error : identifier "cerr" is undefined
+            cerr << "Error: Cannot open file " << filename << endl;
+            ^
+  
+  1 error detected in the compilation of "C:/Users/qzc20/source/repos/CudaRuntime1/CudaRuntime1/nbody_cuda_leapfrog.cu".
   nbody_cuda_leapfrog.cu
-  tmpxft_00008338_00000000-7_nbody_cuda_leapfrog.cudafe1.cpp
-C:\Users\qzc20\source\repos\CudaRuntime1\CudaRuntime1\nbody_cuda_leapfrog.cu(80): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-  CudaRuntime1.vcxproj -> C:\Users\qzc20\source\repos\CudaRuntime1\x64\Debug\nbody_sim.exe
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\BuildCustomizations\CUDA 12.6.targets(799,9): error MSB3721: 命令“"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\bin\nvcc.exe" -gencode=arch=compute_52,code=\"sm_52,compute_52\" --use-local-env -ccbin "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\bin\HostX64\x64" -x cu   -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\include"  -G   --keep-dir x64\Debug  -maxrregcount=0   --machine 64 --compile -cudart static  -g  -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /FS /Zi /RTC1 /MDd " -Xcompiler "/Fdx64\Debug\vc143.pdb" -o C:\Users\qzc20\source\repos\CudaRuntime1\CudaRuntime1\x64\Debug\nbody_cuda_leapfrog.cu.obj "C:\Users\qzc20\source\repos\CudaRuntime1\CudaRuntime1\nbody_cuda_leapfrog.cu"”已退出，返回代码为 2。

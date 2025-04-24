@@ -5,6 +5,7 @@
 #include <cmath>
 #include "vector.hpp"
 #include "body.hpp"
+#include"IO.hpp"
 using namespace std;
 
 using Real = double;
@@ -112,12 +113,9 @@ void run_simulation(std::vector<Particle>& h_bodies, Real deltaT, int steps, con
         if (step % 10 == 0)
         {
             cudaMemcpy(h_bodies.data(), d_bodies, sizeof(Particle) * numBodies, cudaMemcpyDeviceToHost);
-            for (int i = 0; i < numBodies; ++i)
-            {
-                Vec pos = h_bodies[i].getPosition();
-                fout << step << "," << i << "," << pos[0] << "," << pos[1] << "\n";
-            }
+            write_trajectory_csv_frame<Real, dim>(fout, h_bodies, step);
         }
+
     }
 
     cudaMemcpy(h_bodies.data(), d_bodies, sizeof(Particle) * numBodies, cudaMemcpyDeviceToHost);
@@ -130,22 +128,13 @@ void run_simulation(std::vector<Particle>& h_bodies, Real deltaT, int steps, con
 // ===================== Example Main =========================
 int main()
 {
-    std::vector<Particle> bodies = {
-    Particle(190.0, Vector<Real, dim>{-11.1, 3.0}, Vector<Real, dim>{1.3, -0.3}),
-    Particle(170.1, Vector<Real, dim>{ 16.4, 15.0}, Vector<Real, dim>{0.3,  0.3}),
-    Particle(122.0, Vector<Real, dim>{ 32.4, 35.0}, Vector<Real, dim>{0.5,  7.0}),
-    Particle(112.3, Vector<Real, dim>{ 22.1, 35.7}, Vector<Real, dim>{1.5,  -4.3}),
-    };
+    std::vector<Particle> bodies = read_bodies_from_txt<Real, dim>("input.txt");
+    std::cout << "Read " << bodies.size() << " particles from file.\n";
 
     run_simulation(bodies, 0.01, 10000, "trajectory.csv");
-
-    for (int i = 0; i < bodies.size(); ++i)
-    {
-        const auto& b = bodies[i];
-        cout << "Body " << i << ": Pos=" << b.getPosition()
-            << ", Vel=" << b.getVelocity()
-            << ", Acc=" << b.getAcceleration() << endl;
-    }
+  
+    print_bodies(bodies);
+    
 
     return 0;
 }
