@@ -86,7 +86,6 @@
     <ClInclude Include="vector.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\..\..\..\Desktop\input100.txt" />
     <Text Include="CMakeLists.txt" />
     <Text Include="input.txt" />
   </ItemGroup>

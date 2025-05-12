@@ -6,6 +6,7 @@
 #include "vector.hpp"
 #include "body.hpp"
 #include"IO.hpp"
+#include <chrono>
 using namespace std;
 
 using Real = double;
@@ -128,10 +129,17 @@ void run_simulation(std::vector<Particle>& h_bodies, Real deltaT, int steps, con
 // ===================== Example Main =========================
 int main()
 {
+
     std::vector<Particle> bodies = read_bodies_from_txt<Real, dim>("input.txt");
     std::cout << "Read " << bodies.size() << " particles from file.\n";
-
+    auto start = std::chrono::high_resolution_clock::now();
     run_simulation(bodies, 0.01, 10000, "trajectory.csv");
+    auto end = std::chrono::high_resolution_clock::now();
+
+    // compute timecost
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+    std::cout << "Time duration: " << duration.count() << " ms" << std::endl;
   
     print_bodies(bodies);
     
