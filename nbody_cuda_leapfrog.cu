@@ -27,10 +27,7 @@ __host__ __device__ Vector<T, N> computeForce(const Body<T, N>& a, const Body<T,
 
 // ===================== CUDA Kernel: Compute Forces =========================
 template <typename T, int N>
-__global__ void compute_forces_kernel(
-    const Body<T, N>* bodies,
-    Vector<T, N>* forces,
-    int numBodies)
+__global__ void compute_forces_kernel(const Body<T, N>* bodies,Vector<T, N>* forces,int numBodies)
 {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i >= numBodies) return;
@@ -43,15 +40,30 @@ __global__ void compute_forces_kernel(
     }
     forces[i] = totalForce;
 }
+//======================  Compute Energy  ===================================
+ Real computeEnergy(const vector<Body<Real, dim>>& bodies,int bodysize)
+{
+     // Kinetic component
+    Real K = 0.0;
+    for (const auto& body : bodies)
+    {
+        K += 0.5 * body.getMass() * pow(body.getVelocity().norm(), 2.0);
+    }
+    // Potetial component
+    Real U = 0.0;
+    for (size_t i = 0; i < bodysize; ++i) {
+        for (size_t j = i + 1; j < bodysize; ++j) {
+            Real dist = (bodies[i].getPosition() - bodies[j].getPosition()).norm();
+            U += -10 * bodies[i].getMass() * bodies[j].getMass() / dist;
+        }
+    }
+    return K + U;
+}
 
 // ===================== CUDA Kernel: Update Bodies =========================
 template <typename T, int N>
-__global__ void update_bodies_kernel(
-    Body<T, N>* bodies,
-    const Vector<T, N>* forces,
-    int numBodies,
-    T deltaT,
-    int step) {
+__global__ void update_bodies_kernel(  Body<T, N>* bodies,const Vector<T, N>* forces,int numBodies,T deltaT,int step) 
+{
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i >= numBodies) return;
 
@@ -93,6 +105,8 @@ void run_simulation(std::vector<Particle>& h_bodies, Real deltaT, int steps, con
     cudaMemset(d_forces, 0, sizeof(Vec) * numBodies);
 
     std::ofstream fout(output_filename);
+    std::ofstream energyOut("energy_change.csv");
+    energyOut << "Step,TotalE\n";
     fout << "step,id,x,y\n";
 
     std::cout << "Launching kernel with blocks=" << blocks << ", threadsPerBlock=" << threadsPerBlock << std::endl;
@@ -115,6 +129,7 @@ void run_simulation(std::vector<Particle>& h_bodies, Real deltaT, int steps, con
         {
             cudaMemcpy(h_bodies.data(), d_bodies, sizeof(Particle) * numBodies, cudaMemcpyDeviceToHost);
             write_trajectory_csv_frame<Real, dim>(fout, h_bodies, step);
+            energyOut << step << "," << computeEnergy(h_bodies, numBodies) << '\n';
         }
 
     }
@@ -122,6 +137,7 @@ void run_simulation(std::vector<Particle>& h_bodies, Real deltaT, int steps, con
     cudaMemcpy(h_bodies.data(), d_bodies, sizeof(Particle) * numBodies, cudaMemcpyDeviceToHost);
 
     fout.close();
+    energyOut.close();
     cudaFree(d_bodies);
     cudaFree(d_forces);
 }
@@ -135,7 +151,6 @@ int main()
     auto start = std::chrono::high_resolution_clock::now();
     run_simulation(bodies, 0.01, 10000, "trajectory.csv");
     auto end = std::chrono::high_resolution_clock::now();
-
     // compute timecost
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
