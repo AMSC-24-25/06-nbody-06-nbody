@@ -13,33 +13,65 @@
 template <typename T>
 void writePositionsToFile(const std::vector<Body<T, 2>> &bodies, int timestep, std::ofstream &outFile)
 {
-    // Write timestep marker
     outFile << "# Timestep " << timestep << "\n";
-
-    // Write positions and energy of each body
     for (size_t i = 0; i < bodies.size(); ++i)
     {
         const auto &pos = bodies[i].getPosition();
         const auto energy = bodies[i].getEnergy();
         outFile << i << "\t" << pos[0] << "\t" << pos[1] << "\t" << energy << "\n";
     }
-    outFile << "\n"; // Empty line between timesteps for easier parsing
+    outFile << "\n";
+}
+
+template <typename T>
+void updateEntropyGrid(const std::vector<Body<T, 2>> &bodies, std::vector<std::vector<int>> &grid,
+                       T minX, T maxX, T minY, T maxY, T invDx, T invDy)
+{
+    int size = grid.size();
+    for (const auto &body : bodies)
+    {
+        auto pos = body.getPosition();
+        int i = static_cast<int>((pos[0] - minX) * invDx);
+        int j = static_cast<int>((pos[1] - minY) * invDy);
+        if (i >= 0 && i < size && j >= 0 && j < size)
+        {
+            grid[i][j]++;
+        }
+    }
+}
+
+double computeNormalizedEntropy(const std::vector<std::vector<int>> &grid, std::size_t totalSamples, double k_B = 1.0)
+{
+    double entropy = 0.0;
+    int numBins = grid.size() * grid[0].size(); // Total number of grid cells
+
+    for (const auto &row : grid)
+    {
+        for (int count : row)
+        {
+            if (count > 0)
+            {
+                double p = static_cast<double>(count) / static_cast<double>(totalSamples);
+                entropy -= p * std::log(p);
+            }
+        }
+    }
+
+    double maxEntropy = std::log(static_cast<double>(numBins));
+    return (maxEntropy > 0) ? (entropy / maxEntropy) * k_B : 0.0;
 }
 
 int main()
 {
     using T = double;
 
-    // Define universe bounds
     T universeSize = 3.0;
     Vector<T, 2> origin({-universeSize / 2, -universeSize / 2});
     Quad<T> universe(origin, universeSize);
 
-    // Create solver with appropriate timestep
     T timeStep = 1e-5;
     NBodyBHSolver<T> solver(universe, timeStep);
 
-    // Planet data: mass (kg), distance from sun (m), orbital velocity (m/s)
     struct PlanetData
     {
         std::string name;
@@ -50,34 +82,23 @@ int main()
         T vy;
     };
 
-    // Use data from https://numericaltank.sjtu.edu.cn/three-body/three-body-movies.htm
-    // std::vector<PlanetData> planets = {
-    //     {"A", 1.0, -1.0, 0.0, 0.3471168881, 0.5327249454},
-    //     {"B", 1.0, 1.0, 0.0, 0.3471168881, 0.5327249454},
-    //     {"C", 1.0, 0.0, 0.0, -2 * 0.3471168881, -2 * 0.5327249454}};
-
-    // This is I.A_3^{i.c} test case
-    // std::vector<PlanetData> planets = {
-    //     {"A", 1.0, -1.0, 0.0, 0.6150407229, 0.5226158545},
-    //     {"B", 1.0, 1.0, 0.0, 0.6150407229, 0.5226158545},
-    //     {"C", 1.0, 0.0, 0.0, -2 * 0.6150407229, -2 * 0.5226158545}};
-
-    // This is I.A_2^{i.c} test case (with collision)
     std::vector<PlanetData> planets = {
         {"A", 1.0, -1.0, 0.0, 0.3068934205, 0.1255065670},
         {"B", 1.0, 1.0, 0.0, 0.3068934205, 0.1255065670},
         {"C", 1.0, 0.0, 0.0, -2 * 0.3068934205, -2 * 0.1255065670}};
 
-    // Add bodies to the simulation
+    // std::vector<PlanetData> planets = {
+    //     {"A", 1.0, -1.0, 0.0, 0.3471168881, 0.5327249454},
+    //     {"B", 1.0, 1.0, 0.0, 0.3471168881, 0.5327249454},
+    //     {"C", 1.0, 0.0, 0.0, -2 * 0.3471168881, -2 * 0.5327249454}};
+
     for (const auto &planet : planets)
     {
         Vector<T, 2> position({planet.x, planet.y});
         Vector<T, 2> velocity({planet.vx, planet.vy});
-
         solver.addBody(Body<T, 2>(planet.mass, position, velocity));
     }
 
-    // Open output file
     std::ofstream outFile("../particle_positions.txt");
     if (!outFile)
     {
@@ -85,35 +106,56 @@ int main()
         return 1;
     }
 
-    const int numParticles = planets.size();
+    std::ofstream entropyFile("../entropy_log.txt");
+    if (!entropyFile)
+    {
+        std::cerr << "Failed to open entropy file" << std::endl;
+        return 1;
+    }
+    entropyFile << "# Step\tEntropy\n";
 
-    // Write header
+    const int numParticles = planets.size();
     outFile << "# Format: ParticleID\tX\tY\tE\n";
     outFile << "# Number of particles: " << numParticles << "\n\n";
 
-    // Run simulation for 10s (also see 1000s with timestep 1e-4)
-    const int numSteps = 700000;
+    const int numSteps = 1000000;
     std::cout << "Starting simulation with " << numParticles << " particles for " << numSteps << " steps\n";
 
-    // Write initial positions
     solver.calculateEnergy();
     writePositionsToFile(solver.getBodies(), 0, outFile);
 
-    // Simulation loop
+    const int gridSize = 1000;
+    std::vector<std::vector<int>> entropyGrid(gridSize, std::vector<int>(gridSize, 0));
+    std::size_t sampleCount = 0;
+
+    T minX = -universeSize / 2;
+    T maxX = universeSize / 2;
+    T minY = -universeSize / 2;
+    T maxY = universeSize / 2;
+    T invDx = gridSize / (maxX - minX);
+    T invDy = gridSize / (maxY - minY);
+
     for (int step = 1; step <= numSteps; ++step)
     {
         solver.simulateOneStep();
-        solver.calculateEnergy();
 
-        // Write positions every 0.01s
-        if (step % 700 == 0)
+        updateEntropyGrid(solver.getBodies(), entropyGrid, minX, maxX, minY, maxY, invDx, invDy);
+        sampleCount += solver.getBodies().size();
+
+        if (step % 1000 == 0)
         {
+            solver.calculateEnergy();
             writePositionsToFile(solver.getBodies(), step, outFile);
             std::cout << "Completed step " << step << "/" << numSteps << "\n";
+
+            double entropy = computeNormalizedEntropy(entropyGrid, sampleCount);
+            entropyFile << step << "\t" << entropy << "\n";
         }
     }
 
     outFile.close();
+    entropyFile.close();
+
     std::cout << "Simulation complete. Results written to particle_positions.txt\n";
     return 0;
 }
