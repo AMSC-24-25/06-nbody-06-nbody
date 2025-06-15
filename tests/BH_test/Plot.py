@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
 import re
+import sys
 
 
 def read_particle_data(filename):
@@ -102,7 +103,8 @@ def plot_frame(ax, positions, particle_trajectories, colors, frame, limits):
         spine.set_color("white")
 
 
-def save_visualization(filename, fps=20, interval=800):
+# def save_visualization(filename, fps=20, interval=800):
+def save_visualization(filename, gif_name, png_name, fps=20, interval=800):
     timesteps = read_particle_data(filename)
     if not timesteps:
         return
@@ -148,7 +150,8 @@ def save_visualization(filename, fps=20, interval=800):
 
     plt.tight_layout()
     writer = PillowWriter(fps=fps)
-    anim.save("particle_animation.gif", writer=writer, dpi=150)
+    # anim.save("particle_animation.gif", writer=writer, dpi=150)
+    anim.save(gif_name, writer=writer, dpi=150)
     plt.close()
 
     # Save final state
@@ -165,9 +168,29 @@ def save_visualization(filename, fps=20, interval=800):
         limits,
     )
     plt.tight_layout()
-    plt.savefig("final_state.png", dpi=150, bbox_inches="tight", facecolor="black")
+    # plt.savefig("final_state.png", dpi=150, bbox_inches="tight", facecolor="black")
+    plt.savefig(png_name, dpi=150, bbox_inches="tight", facecolor="black")
+    
     plt.close()
 
 
+# if __name__ == "__main__":
+#     save_visualization("particle_positions.txt")
+
+# Pass a filename, use it: python Plot.py particle_positions_openmp.txt
+# If dont pass anything, fall back to default: python Plot.py
 if __name__ == "__main__":
-    save_visualization("particle_positions.txt")
+    filename = sys.argv[1] if len(sys.argv) > 1 else "particle_positions.txt"
+    # Auto-adjust gif and image name based on filename content
+    if len(sys.argv) == 1:
+        # No input provided then use default names
+        save_visualization(filename)
+    else:
+        # OpenMP-specific filename passed in
+        if "openmp" in filename.lower():
+            gif_name = "particle_animation_openmp.gif"
+            png_name = "final_state_openmp.png"
+        else:
+            gif_name = "particle_animation.gif"
+            png_name = "final_state.png"
+        save_visualization(filename, gif_name, png_name)

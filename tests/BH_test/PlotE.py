@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def read_and_plot_energies(filename):
+# def read_and_plot_energies(filename):
+def read_and_plot_energies(filename, output_image):
     timesteps = []
     total_energies = []
     
@@ -60,7 +61,21 @@ def read_and_plot_energies(filename):
     for i in range(min(5, len(timesteps))):
         print(f"Timestep {timesteps[i]}: {total_energies[i]}")
     
-    plt.savefig('energy_evolution.png', dpi=300, bbox_inches='tight')
+    # plt.savefig('energy_evolution.png', dpi=300, bbox_inches='tight')
+    plt.savefig(output_image, dpi=300, bbox_inches='tight')
     plt.close()
 
-read_and_plot_energies('particle_positions.txt')
+# read_and_plot_energies('particle_positions.txt')
+import sys
+import os
+
+if __name__ == "__main__":
+    filename = sys.argv[1] if len(sys.argv) > 1 else "particle_positions.txt"
+    
+    if "openmp" in filename.lower():
+        output_image = "energy_evolution_openmp.png"
+    else:
+        output_image = "energy_evolution.png"
+
+    # read_and_plot_energies(filename)
+    read_and_plot_energies(filename, output_image)
