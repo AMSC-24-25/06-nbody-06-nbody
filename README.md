@@ -20,7 +20,7 @@ We use every thread to compute the entire acceleration of every particle.
 
 ## **The Energy Stability of CUDA Version**
 
-![Energy scalability of CUDA version (using 100 bodies)](Images/total%20energy.jpg)
+![Image from Google Drive](https://drive.google.com/uc?export=view&id=1-5S1qt4WS4UZPgrP3HfeLqwucbCD8C0k)
 
 ---
 
