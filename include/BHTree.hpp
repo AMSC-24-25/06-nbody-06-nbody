@@ -8,8 +8,10 @@
 #include <cmath>
 
 const double G = 1;         // Gravitational constant
-const double THETA = 0.1;   // Barnes-Hut threshold parameter
-const double EPSILON = 0.0; // Softening factor for force calculation (not using now for small size bodies)
+// const double THETA = 0.1;   // Barnes-Hut threshold parameter
+// const double EPSILON = 0; // Softening factor for force calculation (not using now for small size bodies)
+const double THETA = 0.5;
+const double EPSILON = 1;
 
 template <typename T>
 class BHTree
