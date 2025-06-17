@@ -82,10 +82,25 @@ int main()
         T vy;
     };
 
-    std::vector<PlanetData> planets = {
-        {"A", 1.0, -1.0, 0.0, 0.3068934205, 0.1255065670},
-        {"B", 1.0, 1.0, 0.0, 0.3068934205, 0.1255065670},
-        {"C", 1.0, 0.0, 0.0, -2 * 0.3068934205, -2 * 0.1255065670}};
+    // std::vector<PlanetData> planets = {
+    //     {"A", 1.0, -1.0, 0.0, 0.3068934205, 0.1255065670},
+    //     {"B", 1.0, 1.0, 0.0, 0.3068934205, 0.1255065670},
+    //     {"C", 1.0, 0.0, 0.0, -2 * 0.3068934205, -2 * 0.1255065670}};
+    std::vector<PlanetData> planets;
+    std::ifstream in("generated_bodies.txt");
+    double mass, x, y, vx, vy;
+    int id = 0;
+
+    while (in >> x >> y >> vx >> vy >> mass) {
+        PlanetData p;
+        p.name = "P" + std::to_string(id++);
+        p.mass = mass;
+        p.x = x;
+        p.y = y;
+        p.vx = vx;
+        p.vy = vy;
+        planets.push_back(p);
+    }
 
     // std::vector<PlanetData> planets = {
     //     {"A", 1.0, -1.0, 0.0, 0.3471168881, 0.5327249454},
@@ -119,6 +134,8 @@ int main()
     outFile << "# Number of particles: " << numParticles << "\n\n";
 
     const int numSteps = 1000000;
+    // const int numSteps = 10000;  // use small number to test
+
     std::cout << "Starting simulation with " << numParticles << " particles for " << numSteps << " steps\n";
 
     solver.calculateEnergy();

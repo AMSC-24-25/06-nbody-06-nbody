@@ -63,6 +63,7 @@ def read_and_plot_energies(filename, output_image):
     
     # plt.savefig('energy_evolution.png', dpi=300, bbox_inches='tight')
     plt.savefig(output_image, dpi=300, bbox_inches='tight')
+    # plt.show()
     plt.close()
 
 # read_and_plot_energies('particle_positions.txt')

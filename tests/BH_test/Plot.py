@@ -169,7 +169,8 @@ def save_visualization(filename, gif_name, png_name, fps=20, interval=800):
     )
     plt.tight_layout()
     # plt.savefig("final_state.png", dpi=150, bbox_inches="tight", facecolor="black")
-    plt.savefig(png_name, dpi=150, bbox_inches="tight", facecolor="black")
+    # plt.savefig(png_name, dpi=150, bbox_inches="tight", facecolor="black")
+    plt.show()
     
     plt.close()
 
