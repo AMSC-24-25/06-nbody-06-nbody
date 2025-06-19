@@ -10,7 +10,7 @@
 // Namespace and type aliases
 using namespace fmm;
 
-constexpr size_t N = 1000;            // Number of particles 
+constexpr size_t N = 1000;             // Number of particles
 constexpr size_t items_per_leaf = 128; // Items per leaf in the FMM tree
 constexpr size_t d = 2;
 constexpr double extent = 10.0;   // Spatial extent of the galaxy
@@ -48,7 +48,7 @@ std::vector<Particle> generateStableRing(
     const double ring_mass = total_mass - central_mass;
     const double ring_radius = 0.4 * extent; // Larger ring radius
     const double ring_width = 0.2 * extent;  // Narrower ring for stability
-    const double inner_hole = 0.2 * extent;   // Larger inner hole
+    const double inner_hole = 0.2 * extent;  // Larger inner hole
     const int num_arms = 3;
     const double spiral_strength = 0.1; // Much weaker spiral pattern
 
@@ -141,7 +141,7 @@ double total_potential(const std::vector<Particle> &particles)
     {
         sources.emplace_back(p.pos, p.mass);
     }
-    auto V = fields::particlePotentialEnergies<d, true>(sources);
+    auto V = fields::particlePotentialEnergies<d>(sources);
     double E = 0;
     for (size_t i = 0; i < particles.size(); ++i)
         E += 0.5 * V[i]; // half to avoid double counting
@@ -163,7 +163,7 @@ int main()
     std::vector<Src> sources(particles.size());
     for (size_t i = 0; i < particles.size(); ++i)
         sources[i] = Src(particles[i].pos, particles[i].mass);
-    BalancedFmmTree<d, true> tree(sources, items_per_leaf, eps);
+    BalancedFmmTree<d> tree(sources, items_per_leaf, eps);
     for (size_t i = 0; i < particles.size(); ++i)
         particles[i].acc = tree.evaluateForcefield(particles[i].pos) / particles[i].mass;
 
@@ -180,7 +180,7 @@ int main()
         // --- Build FMM for new positions, compute new acc ---
         for (size_t i = 0; i < particles.size(); ++i)
             sources[i] = Src(particles[i].pos, particles[i].mass);
-        BalancedFmmTree<d, true> tree_step(sources, items_per_leaf, eps);
+        BalancedFmmTree<d> tree_step(sources, items_per_leaf, eps);
         for (size_t i = 0; i < particles.size(); ++i)
             particles[i].acc = tree_step.evaluateForcefield(particles[i].pos) / particles[i].mass;
 
