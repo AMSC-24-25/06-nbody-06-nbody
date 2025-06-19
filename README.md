@@ -1,32 +1,62 @@
-# 🌌 N-Body Simulation
+# ⚙️ Naive method using OpenMP
 
-A collection of N-Body simulation implementations exploring different computational architectures and algorithmic methods. This project compares performance and accuracy across CPU and GPU platforms, providing a learning and benchmarking resource for high-performance computing applications.
+This branch contains a **multithreaded CPU implementation** of the N-Body simulation using OpenMP with the Naive method.
 
-## 🧠 Project Overview
+## ⚙️ Description
 
-The N-Body problem simulates the motion of a system of particles under mutual gravitational influence. This repository includes several implementations with varying degrees of optimization, parallelism, and hardware utilization, enabling comparative analysis and performance study.
+- Computes all the pairwise energies
+- Parallelizes force calculations across multiple CPU threads.
 
-## 🌿 Branches
 
-The repository is organized into multiple branches, each containing a specific implementation:
+## 🧪 How to Run
 
-- 🧮 **`cpu-openmp`** – Basic OpenMP implementation using the Naive method. For reference.
-- 🚀 **`gpu-cuda`** – CUDA implementation leveraging GPU acceleration.
-- 🔁 **`gpu-opencl`** – OpenCL implementation for cross-platform GPU execution.
-- 📏 **`cpu-vectorized`** – CPU SIMD-vectorized implementation using intrinsics or compiler autovectorization.
-- 📊 **`visualization`** – Tool to visualize the results
+### 🔧 Prerequisites
 
-*(Customize or update the branch list above according to your actual repo structure.)*
+- A C++ compiler with OpenMP support (e.g., `g++` or `clang++`)
 
-## 📄 Report
+### 🛠️ Compilation
 
-A detailed report discussing the design choices, performance evaluations, and results of the simulations can be found at:  
-👉 **[*link*](#)**
+There are various already-made code snippets in the `tests` folder.
+To build them, go in the appropriate folder and run the following
 
-## 👥 Authors
+```bash
+mkdir build
+cd build
+cmake ..
+make
+./<executable name>
+```
 
-- Luca Ballone  
-- Rong Huang  
-- Andrea Barletta  
-- Yanlong Wang  
-- Zhaochen Qiao
+To make your own tests, modify the *CMakeListsTemplate.txt* file accordingly
+
+### 📄 Input File Format
+
+The input file for initial positions should contain:
+
+```
+N
+m1
+x1 y1
+vx1 vy1
+m2
+x2 y2
+vx2 vy2
+...
+mN
+xN yN
+vxN vyN
+```
+
+Where:
+- `N` is the number of particles
+- `mK` is the k-th body mass
+- `xK yK` is the k-th body intial position
+- `vxK vyK` is the k-th body intial velocity
+
+Some example for initial conditions can be found in the folder *initial_conditions*
+
+### 🧯 Output
+
+The program can output:
+- Position of each body per timestep
+- Total energy per timestep
