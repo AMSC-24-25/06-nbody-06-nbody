@@ -55,6 +55,7 @@ set(HEADER_FILES
     abstract_quadtree.hpp
     balanced_quadtree.hpp
     vector.hpp
+    particle_generators.hpp
     abstract_fmm_tree.hpp
     balanced_fmm_tree.hpp
     series_expansion.hpp
