@@ -1,45 +1,32 @@
+# 🌌 N-Body Simulation
 
-# Numerical N-Body Solution
-In an n-body problem, we need to find the positions and velocities of a collection of
-interacting particles over a period of time.
-An
-n-body solver is a program that finds the solution to an n-body problem by simulating
-the behavior of the particles.
+A collection of N-Body simulation implementations exploring different computational architectures and algorithmic methods. This project compares performance and accuracy across CPU and GPU platforms, providing a learning and benchmarking resource for high-performance computing applications.
 
+## 🧠 Project Overview
 
+The N-Body problem simulates the motion of a system of particles under mutual gravitational influence. This repository includes several implementations with varying degrees of optimization, parallelism, and hardware utilization, enabling comparative analysis and performance study.
 
-## Features
+## 🌿 Branches
 
-- Loading initial conditions from external file
-- Computing position, velocity, and total energy for each timestep
-- Plot an animation of the positions of the bodies
-- Plot the behaviour of energy over time
+The repository is organized into multiple branches, each containing a specific implementation:
 
+- 🧮 **`cpu-openmp`** – Basic OpenMP implementation using the Naive method. For reference.
+- 🚀 **`gpu-cuda`** – CUDA implementation leveraging GPU acceleration.
+- 🔁 **`gpu-opencl`** – OpenCL implementation for cross-platform GPU execution.
+- 📏 **`cpu-vectorized`** – CPU SIMD-vectorized implementation using intrinsics or compiler autovectorization.
+- 📊 **`visualization`** – Tool to visualize the results
 
-## Running Tests
+*(Customize or update the branch list above according to your actual repo structure.)*
 
-The tests are found in the "tests" folder.
-To run them run the following commands
+## 📄 Report
 
-```bash
-  mkdir build
-  cd build
-  cmake ..
-  make
-```
+A detailed report discussing the design choices, performance evaluations, and results of the simulations can be found at:  
+👉 **[*link*](#)**
 
-The initial conditions, found in the "initial_conditions" folder, are to be put in the "build" folder
+## 👥 Authors
 
-## Main results
-
-[Report](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/results/report.md)
-
-
-## Authors
-
-- Luca Ballone
-- Rong Huang
-- Andrea Barletta
-- Yanlong Wang
+- Luca Ballone  
+- Rong Huang  
+- Andrea Barletta  
+- Yanlong Wang  
 - Zhaochen Qiao
-
