@@ -141,7 +141,7 @@ double total_potential(const std::vector<Particle> &particles)
     {
         sources.emplace_back(p.pos, p.mass);
     }
-    auto V = fields::particlePotentialEnergies<d, false>(sources);
+    auto V = fields::particlePotentialEnergies<d, true>(sources);
     double E = 0;
     for (size_t i = 0; i < particles.size(); ++i)
         E += 0.5 * V[i]; // half to avoid double counting
@@ -163,7 +163,7 @@ int main()
     std::vector<Src> sources(particles.size());
     for (size_t i = 0; i < particles.size(); ++i)
         sources[i] = Src(particles[i].pos, particles[i].mass);
-    BalancedFmmTree<d, false> tree(sources, items_per_leaf, eps);
+    BalancedFmmTree<d, true> tree(sources, items_per_leaf, eps);
     for (size_t i = 0; i < particles.size(); ++i)
         particles[i].acc = tree.evaluateForcefield(particles[i].pos) / particles[i].mass;
 
@@ -180,7 +180,7 @@ int main()
         // --- Build FMM for new positions, compute new acc ---
         for (size_t i = 0; i < particles.size(); ++i)
             sources[i] = Src(particles[i].pos, particles[i].mass);
-        BalancedFmmTree<d, false> tree_step(sources, items_per_leaf, eps);
+        BalancedFmmTree<d, true> tree_step(sources, items_per_leaf, eps);
         for (size_t i = 0; i < particles.size(); ++i)
             particles[i].acc = tree_step.evaluateForcefield(particles[i].pos) / particles[i].mass;
 
