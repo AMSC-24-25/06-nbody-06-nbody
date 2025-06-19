@@ -66,7 +66,7 @@ set(HEADER_FILES
 
 # Define the main target
 set(TARGET_NAME integrator_leapfrog_2d)
-set(SOURCE_FILE examples/integrator_leapfrog_2d.cpp)
+set(SOURCE_FILE Integration/integrator_leapfrog_2d.cpp)
 
 add_executable(${TARGET_NAME} ${SOURCE_FILE})
 
