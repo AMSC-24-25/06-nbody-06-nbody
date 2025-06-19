@@ -10,9 +10,9 @@
 namespace fmm
 {
 
-    template <std::size_t d, bool field_type = true>
+    template <std::size_t d>
     class BalancedFmmTree : public BalancedQuadtree<Vector_<d>, d>,
-                            public AbstractFmmTree<d, field_type>
+                            public AbstractFmmTree<d>
     {
 
     protected:
@@ -55,8 +55,8 @@ namespace fmm
         void computeNodeNeighbourhood(FmmNode *node);
     };
 
-    template <std::size_t d, bool field_type>
-    struct BalancedFmmTree<d, field_type>::FmmNode : BaseNode
+    template <std::size_t d>
+    struct BalancedFmmTree<d>::FmmNode : BaseNode
     {
         MultipoleExpansion<d> multipole_expansion;
         LocalExpansion<d> local_expansion;
@@ -69,10 +69,10 @@ namespace fmm
         virtual ~FmmNode() {};
     };
 
-    template <std::size_t d, bool field_type>
-    struct BalancedFmmTree<d, field_type>::FmmLeaf : BalancedFmmTree<d, field_type>::FmmNode
+    template <std::size_t d>
+    struct BalancedFmmTree<d>::FmmLeaf : BalancedFmmTree<d>::FmmNode
     {
-        using Super = BalancedFmmTree<d, field_type>::FmmNode;
+        using Super = BalancedFmmTree<d>::FmmNode;
         std::vector<Body> *sources;
         FmmLeaf() {};
         FmmLeaf(Vector center, double box_length, std::size_t depth,
@@ -82,11 +82,11 @@ namespace fmm
         virtual ~FmmLeaf() { delete sources; }
     };
 
-    template <std::size_t d, bool field_type>
-    BalancedFmmTree<d, field_type>::BalancedFmmTree(
+    template <std::size_t d>
+    BalancedFmmTree<d>::BalancedFmmTree(
         std::vector<Body_<d>> &sources, std::size_t sources_per_cell,
         double eps, double force_smoothing_eps) : BalancedQuadtree<Vector, d>(),
-                                                  AbstractFmmTree<d, field_type>(sources, eps, force_smoothing_eps)
+                                                  AbstractFmmTree<d>(sources, eps, force_smoothing_eps)
     {
 
         // Determine tree height, numbers of nodes and leaves
@@ -95,7 +95,7 @@ namespace fmm
         n_leaves = std::pow(AOT::n_children, this->height);
 
         // Determine bounding box lenghts and center
-        auto [lower_bounds, upper_bounds] = AbstractFmmTree<d, field_type>::getDataRange();
+        auto [lower_bounds, upper_bounds] = AbstractFmmTree<d>::getDataRange();
         auto extents = (upper_bounds - lower_bounds).data();
         double box_length = *std::max_element(extents.begin(), extents.end());
         Vector center = 0.5 * (lower_bounds + upper_bounds);
@@ -177,66 +177,56 @@ namespace fmm
         }
     }
 
-    template <std::size_t d, bool field_type>
-    double BalancedFmmTree<d, field_type>::evaluatePotential(const Vector &eval_point) const
+    template <std::size_t d>
+    double BalancedFmmTree<d>::evaluatePotential(const Vector &eval_point) const
     {
         uint64_t leaf_index = this->getMortonIndex(this->getLeafBoxIndices(eval_point));
         FmmLeaf &containing_leaf = leaves[leaf_index];
         double pot = containing_leaf.local_expansion.evaluatePotential(eval_point);
-        const bool grav = 1;
         const bool safe = 1;
         for (auto leaf : containing_leaf.near_neighbours)
         {
             if (leaf != &containing_leaf)
             {
-                pot += fields::potential<d, grav, !safe>(
+                pot += fields::potential<d, !safe>(
                     *static_cast<FmmLeaf *>(leaf)->sources, eval_point);
             }
             else
             {
-                pot += fields::potential<d, grav, safe>(
+                pot += fields::potential<d, safe>(
                     *static_cast<FmmLeaf *>(leaf)->sources, eval_point);
             }
-        }
-        if constexpr (field_type == 0)
-        {
-            pot = -pot;
         }
         return pot;
     }
 
-    template <std::size_t d, bool field_type>
-    Vector_<d> BalancedFmmTree<d, field_type>::evaluateForcefield(const Vector_<d> &eval_point) const
+    template <std::size_t d>
+    Vector_<d> BalancedFmmTree<d>::evaluateForcefield(const Vector_<d> &eval_point) const
     {
         uint64_t leaf_index = this->getMortonIndex(this->getLeafBoxIndices(eval_point));
         FmmLeaf &containing_leaf = leaves[leaf_index];
         Vector force_vec = containing_leaf.local_expansion.evaluateForcefield(eval_point);
-        const bool grav = 1;
         const bool safe = 1;
         for (auto leaf : containing_leaf.near_neighbours)
         {
             if (leaf != &containing_leaf)
             {
-                force_vec += fields::forcefield<d, grav, !safe>(
+                force_vec += fields::forcefield<d, !safe>(
                     *static_cast<FmmLeaf *>(leaf)->sources,
                     eval_point, this->force_smoothing_eps);
             }
             else
             {
-                force_vec += fields::forcefield<d, grav, safe>(
+                force_vec += fields::forcefield<d, safe>(
                     *static_cast<FmmLeaf *>(leaf)->sources,
                     eval_point, this->force_smoothing_eps);
             }
         }
-        if constexpr (field_type == 0)
-        {
-            force_vec = -force_vec;
-        }
         return force_vec;
     }
 
-    template <std::size_t d, bool field_type>
-    void BalancedFmmTree<d, field_type>::toFile()
+    template <std::size_t d>
+    void BalancedFmmTree<d>::toFile()
     {
         namespace fs = std::filesystem;
         std::string logs_dir = "./logs";
@@ -298,8 +288,8 @@ namespace fmm
 
     // Computes near neighbour list and interaction list of a node, assuming that
     // these lists have already been computed for the parent node.
-    template <std::size_t d, bool field_type>
-    void BalancedFmmTree<d, field_type>::computeNodeNeighbourhood(FmmNode *node)
+    template <std::size_t d>
+    void BalancedFmmTree<d>::computeNodeNeighbourhood(FmmNode *node)
     {
         auto &interaction_list = node->interaction_list;
         auto &near_neighbours = node->near_neighbours;
@@ -332,9 +322,9 @@ namespace fmm
         }
     }
 
-    template <std::size_t d, bool field_type>
-    void BalancedFmmTree<d, field_type>::expandNode(FmmNode *node,
-                                                    std::size_t &node_offset, std::size_t &leaf_offset)
+    template <std::size_t d>
+    void BalancedFmmTree<d>::expandNode(FmmNode *node,
+                                        std::size_t &node_offset, std::size_t &leaf_offset)
     {
         Vector parent_center = node->center;
         double child_box_length = node->box_length / 2;
@@ -365,8 +355,8 @@ namespace fmm
         }
     }
 
-    template <std::size_t d, bool field_type>
-    void BalancedFmmTree<d, field_type>::distributeBodys()
+    template <std::size_t d>
+    void BalancedFmmTree<d>::distributeBodys()
     {
         std::vector<Body> **leaf_source_vectors = new std::vector<Body> *[n_leaves];
         for (std::size_t i = 0; i < n_leaves; i++)

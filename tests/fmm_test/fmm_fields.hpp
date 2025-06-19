@@ -10,11 +10,10 @@ namespace fmm
     namespace fields
     {
 
-        // Gravitational (if grav = true) or Coulomb (if grav = false) potential
-        // by a single source in 2D. With safe = true, this function checks
-        // whether the evaluation point coincides with the source location
-        // and returns zero in that case
-        template <std::size_t d, bool grav = true, bool safe = true>
+        // Gravitational potential by a single source in 2D.
+        // With safe = true, this function checks whether the evaluation point
+        // coincides with the source location and returns zero in that case
+        template <std::size_t d, bool safe = true>
         double potential(const Body_<d> &src, const Vector_<d> &eval_point)
         {
             static_assert(d == 2, "Only 2D implementation is provided.");
@@ -26,32 +25,23 @@ namespace fmm
                     return 0;
                 }
             }
-            double pot = src.q * std::log(r);
-            if constexpr (grav)
-            {
-                return pot;
-            }
-            else
-            {
-                return -pot;
-            }
+            return src.q * std::log(r);
         }
 
         // Overload for multiple sources
-        template <std::size_t d, bool grav = true, bool safe = true>
+        template <std::size_t d, bool safe = true>
         double potential(const std::vector<Body_<d>> &sources, const Vector_<d> &eval_point)
         {
             double pot = 0;
             for (const auto &s : sources)
-                pot += potential<d, grav, safe>(s, eval_point);
+                pot += potential<d, safe>(s, eval_point);
             return pot;
         }
 
-        // Gravitational (if grav = true) or Coulomb (if grav = false) force field
-        // by a single source in 2D. With safe = true, this function checks
-        // whether the evaluation point coincides with the source location and
-        // returns the zero vector in that case
-        template <std::size_t d, bool grav = true, bool safe = true>
+        // Gravitational force field by a single source in 2D.
+        // With safe = true, this function checks whether the evaluation point
+        // coincides with the source location and returns the zero vector in that case
+        template <std::size_t d, bool safe = true>
         Vector_<d> forcefield(const Body_<d> &src, const Vector_<d> &eval_point, const double eps = 0)
         {
             static_assert(d == 2, "Only 2D implementation is provided.");
@@ -64,29 +54,21 @@ namespace fmm
                     return Vector_<d>{};
                 }
             }
-            diff *= src.q / (r_sq + eps);
-            if constexpr (grav)
-            {
-                return diff;
-            }
-            else
-            {
-                return -diff;
-            }
+            return diff * (src.q / (r_sq + eps));
         }
 
         // Overload for multiple sources
-        template <std::size_t d, bool grav = true, bool safe = true>
+        template <std::size_t d, bool safe = true>
         Vector_<d> forcefield(const std::vector<Body_<d>> &sources, const Vector_<d> &eval_point, const double eps = 0)
         {
             Vector_<d> frc{};
             for (const auto &s : sources)
-                frc += forcefield<d, grav, safe>(s, eval_point, eps);
+                frc += forcefield<d, safe>(s, eval_point, eps);
             return frc;
         }
 
         // Parallelized function for computation of all potentials on all particles
-        template <std::size_t d, bool grav = true>
+        template <std::size_t d>
         std::vector<double> particlePotentialEnergies(const std::vector<Body_<d>> &sources)
         {
             static_assert(d == 2, "Only 2D implementation is provided.");
@@ -100,7 +82,7 @@ namespace fmm
                 double particle_epot = 0;
                 for (std::size_t j = 0; j < i; ++j)
                 {
-                    double temp_epot = Qi * potential<d, grav, false>(sources[j], eval_point);
+                    double temp_epot = Qi * potential<d, false>(sources[j], eval_point);
                     particle_epot += temp_epot;
 #pragma omp atomic
                     particle_potentials[j] += temp_epot;
@@ -112,7 +94,7 @@ namespace fmm
         }
 
         // Parallelized function for computation of all forces on all particles
-        template <std::size_t d, bool grav = true>
+        template <std::size_t d>
         std::vector<Vector_<d>> particleForces(const std::vector<Body_<d>> &sources, const double eps = 0)
         {
             static_assert(d == 2, "Only 2D implementation is provided.");
@@ -126,7 +108,7 @@ namespace fmm
                 Vector_<d> particle_force{0}; // Force on part. i by all j < i
                 for (std::size_t j = 0; j < i; ++j)
                 {
-                    Vector_<d> temp_force = Qi * forcefield<d, grav, false>(sources[j], eval_point, eps);
+                    Vector_<d> temp_force = Qi * forcefield<d, false>(sources[j], eval_point, eps);
                     particle_force += temp_force;
                     for (unsigned short k = 0; k < d; ++k)
                     {

@@ -15,7 +15,7 @@
 namespace fmm
 {
 
-    template <std::size_t d, bool field_type> // true => Grav., false => Coulomb
+    template <std::size_t d>
     class AbstractFmmTree
     {
 
@@ -62,8 +62,8 @@ namespace fmm
         void multipoleToLocal(FmmNode &node);
     };
 
-    template <std::size_t d, bool field_type>
-    std::vector<double> AbstractFmmTree<d, field_type>::
+    template <std::size_t d>
+    std::vector<double> AbstractFmmTree<d>::
         evaluateParticlePotentialEnergies() const
     {
         std::vector<double> potentials(sources.size());
@@ -75,8 +75,8 @@ namespace fmm
         return potentials;
     }
 
-    template <std::size_t d, bool field_type>
-    std::vector<Vector_<d>> AbstractFmmTree<d, field_type>::
+    template <std::size_t d>
+    std::vector<Vector_<d>> AbstractFmmTree<d>::
         evaluateParticleForces() const
     {
         std::vector<Vector> forces(sources.size());
@@ -88,8 +88,8 @@ namespace fmm
         return forces;
     }
 
-    template <std::size_t d, bool field_type>
-    std::tuple<Vector_<d>, Vector_<d>> AbstractFmmTree<d, field_type>::getDataRange() const
+    template <std::size_t d>
+    std::tuple<Vector_<d>, Vector_<d>> AbstractFmmTree<d>::getDataRange() const
     {
         Vector lower_bounds, upper_bounds;
         lower_bounds.fill(HUGE_VAL);
@@ -110,9 +110,9 @@ namespace fmm
         return std::make_tuple(lower_bounds, upper_bounds);
     }
 
-    template <std::size_t d, bool field_type>
+    template <std::size_t d>
     template <typename FmmNode>
-    void AbstractFmmTree<d, field_type>::localToLocal(FmmNode &node)
+    void AbstractFmmTree<d>::localToLocal(FmmNode &node)
     {
         FmmNode *parent = static_cast<FmmNode *>(node.parent);
         assert(parent != nullptr);
@@ -120,9 +120,9 @@ namespace fmm
         node.local_expansion += LE(node.center, parent->local_expansion);
     }
 
-    template <std::size_t d, bool field_type>
+    template <std::size_t d>
     template <typename FmmNode>
-    void AbstractFmmTree<d, field_type>::multipoleToLocal(FmmNode &node)
+    void AbstractFmmTree<d>::multipoleToLocal(FmmNode &node)
     {
         std::vector<const ME *> incoming;
         for (FmmNode *interaction_partner : node.interaction_list)
