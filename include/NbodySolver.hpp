@@ -17,6 +17,7 @@ private:
     unsigned int numBodies;
     std::vector<Body<Real, dim>> bodies;
     mutable std::vector<std::vector<Vector<Real, dim>>> forces;
+    static constexpr unsigned int epsilon = 1e-10;
 
     // Generic force term
     inline Vector<Real, dim> computeForce(const Body<Real, dim> &b1, const Body<Real, dim> &b2) const
@@ -24,7 +25,7 @@ private:
         Vector<Real, dim> r = b1.getPosition() - b2.getPosition();
         Real dist = r.norm();
         Real dist_cube = dist * dist * dist;
-        r = -(G * b1.getMass() * b2.getMass() / dist_cube) * r;
+        r = -(G * b1.getMass() * b2.getMass() / (dist_cube + epsilon)) * r;
         return r;
     }
 
