@@ -91,7 +91,9 @@ int main()
     //     {"A", 1.0, -1.0, 0.0, 0.3068934205, 0.1255065670},
     //     {"B", 1.0, 1.0, 0.0, 0.3068934205, 0.1255065670},
     //     {"C", 1.0, 0.0, 0.0, -2 * 0.3068934205, -2 * 0.1255065670}};
+
     std::vector<PlanetData> planets;
+    
     // std::ifstream in("generated_bodies.txt");
     // std::ifstream in("GeneratedBodies/generated_bodies_500.txt");
     // std::ifstream in("GeneratedBodies/generated_bodies_1000.txt");
@@ -190,6 +192,7 @@ int main()
 
     std::cout << "Simulation complete. Results written to particle_positions_openmp.txt\n";
 
+    // Measure the total time taken for the simulation
     auto end = std::chrono::high_resolution_clock::now();
     double duration = std::chrono::duration<double>(end - start).count();
 

@@ -4,7 +4,7 @@ import pandas as pd
 # Load the CSV 
 df = pd.read_csv("../openmp_runtime_different_threads.csv")
 
-# Filter for a specific body count (e.g. 500, 1000)
+# Filter for a specific body count (e.g. 500, 1000, 5000)
 body_count = 5000
 df = df[df["Bodies"] == body_count]
 
@@ -21,6 +21,5 @@ plt.title(f"OpenMP Avg Time per Step for {body_count} Bodies")
 plt.grid(True)
 plt.tight_layout()
 
-# Save and show
+# Save the plot
 plt.savefig(f"OpenmpRuntime/openmp_time_per_step_{body_count}bodies.png", dpi=300)
-# plt.show()
