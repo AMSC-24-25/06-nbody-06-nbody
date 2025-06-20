@@ -35,6 +35,7 @@ We use every thread to compute the entire acceleration of every particle.
 | input_size = 1000 | 1.773 ms | 21.82 ms | 115.329 ms |
 
 > **Table:** Time Cost Per Step  — CUDA vs OpenMP vs Basic Version
+---
 Based on the cuda run time is not very stable, we run the program several times and calculate the average value.\\
 > We can see from the table that when the number of particles is large, the advantage of CUDA is obvious.
 ## **Possible Ways to Improve**
