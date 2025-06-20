@@ -26,18 +26,17 @@ We use every thread to compute the entire acceleration of every particle.
 
 ## **Benchmark**
 
-| Condition | CUDA | OpenMP | Basic Version |
+
+| Condition(delta t=0.001 T=1) | CUDA | OpenMP | Basic Version |
 |----------|------|--------|---------------|
-| input_size = 100, T = 1000, ΔT = 0.01 | 853 ms | 30,380 ms | 110,024 ms |
-| input_size = 100, T = 1000, ΔT = 0.1  | 732 ms | 3,126 ms  | 11,506 ms  |
-| input_size = 200, T = 1000, ΔT = 0.01 | 1,014 ms | 108,657 ms | 458,277 ms |
-| input_size = 200, T = 1000, ΔT = 0.1  | 2,169 ms | 11,170 ms  | 46,606 ms  |
-| input_size = 4000, T = 1000, ΔT = 0.01| 34,240 ms | NA | NA |
+| input_size = 100 | 0.327 ms | 0.295 ms | 1.128 ms |
+| input_size = 200 | 0.557 ms | 1.078 ms | 4.648ms |
+| input_size = 500 | 0.719ms | 5.743 ms | 26.95 ms |
+| input_size = 1000 | 1.773 ms | 21.82 ms | 115.329 ms |
 
-> **Table:** Time Cost — CUDA vs OpenMP vs Basic Version
-
----
-
+> **Table:** Time Cost Per Step  — CUDA vs OpenMP vs Basic Version
+Based on the cuda run time is not very stable, we run the program several times and calculate the average value.\\
+> We can see from the table that when the number of particles is large, the advantage of CUDA is obvious.
 ## **Possible Ways to Improve**
 
 1. Merge possible kernels  
