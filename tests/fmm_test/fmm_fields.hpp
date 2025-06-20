@@ -25,6 +25,14 @@ namespace fmm
                     return 0;
                 }
             }
+            // About the sign, here we just set the reference length L to 1 which means
+            // that the potential is negative if r < 1 and positive if r > 1.
+            // This is a common choice in physics, where the potential is defined
+            // with respect to a reference point at infinity.
+            // In 2D, the potential is logarithmic, so we use the formula:
+            // G * M * ln(r), where M is the source strength (mass or charge
+            // Actually the reference length is just a shift in the potential,
+            // the shape of the potential is preserved.
             return src.q * std::log(r);
         }
 
@@ -54,6 +62,7 @@ namespace fmm
                     return Vector_<d>{};
                 }
             }
+            // Avoid division by zero by adding a small epsilon
             return diff * (src.q / (r_sq + eps));
         }
 

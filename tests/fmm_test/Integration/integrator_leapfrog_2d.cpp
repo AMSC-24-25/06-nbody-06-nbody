@@ -15,7 +15,8 @@ constexpr size_t d = 2;
 constexpr double extent = 10.0;
 constexpr double dt = 0.0001;
 constexpr size_t n_steps = 10000;
-constexpr double eps = 0.1;
+constexpr double fault_tolerance_eps = 0.1;
+constexpr double soften_eps = 0.01; // Softening parameter for force
 const double G = 1.0;
 
 using Vec = Vector_<d>;
@@ -57,11 +58,11 @@ int main()
     std::vector<Vec> accelerations(bodies.size());
 
     // Initial velocities: only set for ring, central mass is 0 velocity
+    double v_circular = std::sqrt(G * bodies[0].q);
     for (size_t i = 1; i < bodies.size(); ++i) // skip 0: central body
     {
         auto pos = bodies[i].position;
         double r = pos.norm();
-        double v_circular = std::sqrt(G * bodies[0].q / r) * 4;
         velocities[i][0] = -pos[1] / r * v_circular;
         velocities[i][1] = pos[0] / r * v_circular;
     }
@@ -72,7 +73,7 @@ int main()
     write_positions(bodies, out_positions, 0);
 
     // Initial acceleration
-    BalancedFmmTree<d> tree(bodies, items_per_leaf, eps);
+    BalancedFmmTree<d> tree(bodies, items_per_leaf, fault_tolerance_eps, soften_eps);
     for (size_t i = 0; i < bodies.size(); ++i)
         accelerations[i] = tree.evaluateForcefield(bodies[i].position) / bodies[i].q;
 
@@ -87,7 +88,7 @@ int main()
             bodies[i].position += dt * velocities[i];
 
         // Update FMM and accelerations
-        BalancedFmmTree<d> tree_step(bodies, items_per_leaf, eps);
+        BalancedFmmTree<d> tree_step(bodies, items_per_leaf, fault_tolerance_eps, soften_eps);
         for (size_t i = 0; i < bodies.size(); ++i)
             accelerations[i] = tree_step.evaluateForcefield(bodies[i].position) / bodies[i].q;
 
@@ -108,5 +109,13 @@ int main()
     }
     out_positions.close();
     out_energy.close();
-    return 0;
+
+    // // Final comparison of potential energy compared to the direct calculation
+    // BalancedFmmTree<d, field_type> t(sources, items_per_leaf, fault_tolerance_eps);
+    // Vec eval_point = sources[0].position;
+
+    // std::cout << "Potential at " << eval_point << " evaluated via the FMM is " << t.evaluatePotential(eval_point) << " vs "
+    //           << fields::potential<d, field_type>(sources, eval_point)
+    //           << " when evaluated directly. \n";
+    // return 0;
 }

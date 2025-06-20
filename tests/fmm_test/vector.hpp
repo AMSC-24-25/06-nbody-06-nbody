@@ -73,6 +73,7 @@ namespace fmm
                                       rhs.data().begin(), 0.);
         }
 
+        // Euclidean norm
         double norm() const
         {
             if constexpr (d == 1)
@@ -87,6 +88,9 @@ namespace fmm
             return std::sqrt(this->dot(*this));
         }
 
+        // Returns squared Euclidean norm, it is faster than norm() since it does not
+        // require a square root calculation.
+        // It is useful for comparisons, e.g. in the FMM algorithm.
         double norm_sq() const
         {
             if constexpr (d == 1)

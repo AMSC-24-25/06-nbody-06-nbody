@@ -109,8 +109,7 @@ namespace fmm
             result += (*this)(j)*z_rel_inv_pow;
             z_rel_inv_pow /= z_rel;
         }
-        // Return -result.real() for the electrostatic potential,
-        // +result.real() for the gravitational potential.
+        // Return +result.real() for the gravitational potential.
         return result.real();
     }
 
@@ -127,7 +126,6 @@ namespace fmm
             z_rel_inv_pow /= z_rel;
         }
         // The gravitational field is given by {{-result.real(), result.imag()}}.
-        // For the electric field, return {{result.real(), -result.imag()}}.
         return {{-result.real(), result.imag()}};
     }
 

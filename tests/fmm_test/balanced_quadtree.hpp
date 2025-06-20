@@ -73,8 +73,7 @@ uint32_t BalancedQuadtree<Vector, d>::
 }
 
 // Compute 64-bit morton index from d-tuple of 32-bit unsigned indices
-// Interleaving order x (least significant), y, z(most significant)
-// is used here.
+// Interleaving order x (least significant), y (most significant) is used here.
 template <typename Vector, std::size_t d>
 unsigned long long BalancedQuadtree<Vector, d>::
     getMortonIndex(const std::array<uint32_t, d> &indices) const
