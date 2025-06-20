@@ -31,6 +31,7 @@ struct FmmError
     double rel_max;
 };
 
+// Function to write positions of bodies to a file
 void write_positions(const std::vector<Src> &bodies, std::ofstream &out, int step)
 {
     out << "# Timestep " << step << "\n";
@@ -39,6 +40,7 @@ void write_positions(const std::vector<Src> &bodies, std::ofstream &out, int ste
     out << "\n";
 }
 
+// Function to compute FMM error against direct potential calculation
 FmmError compute_fmm_error(
     std::vector<Src> &bodies,
     size_t items_per_leaf,
@@ -68,6 +70,7 @@ FmmError compute_fmm_error(
     return {abs_tot, rel_tot, max_abs_error, max_rel_error};
 }
 
+// Function to sweep through different fault tolerance epsilons and compute errors
 void sweep_fault_tolerance(
     std::vector<Src> &bodies,
     double soften_eps,
@@ -92,6 +95,7 @@ void sweep_fault_tolerance(
     out.close();
 }
 
+// Function to sweep through different numbers of items per leaf and compute errors
 void sweep_items_per_leaf(
     std::vector<Src> &bodies,
     double soften_eps,
@@ -116,6 +120,7 @@ void sweep_items_per_leaf(
     out.close();
 }
 
+// Function to test the integration over time and error accumulation
 void integration_over_time_error_test()
 {
     double total_mass = N * 1.0;
@@ -205,9 +210,48 @@ void integration_over_time_error_test()
     std::cout << "Integration test complete. Output written to accuracy_positions.txt and accuracy_error_vs_time.txt\n";
 }
 
+// Function to write a spatial error map of FMM vs direct potential
+void write_spatial_error_map(
+    std::vector<Src> &sources,
+    size_t items_per_leaf,
+    double fault_tolerance_eps,
+    double soften_eps,
+    double xmin, double xmax, double ymin, double ymax,
+    int ngrid,
+    const std::string &out_filename)
+{
+    std::ofstream out(out_filename);
+    out << "# x y log10_rel_error\n";
+
+    BalancedFmmTree<d> tree(sources, items_per_leaf, fault_tolerance_eps, soften_eps);
+
+    // In our case the smaller grid size is about 0.05*0.05
+    for (int ix = 0; ix < ngrid; ++ix)
+    {
+        double x = xmin + (xmax - xmin) * ix / (ngrid - 1);
+        for (int iy = 0; iy < ngrid; ++iy)
+        {
+            double y = ymin + (ymax - ymin) * iy / (ngrid - 1);
+            Vec eval_point({x, y});
+
+            double fmm = tree.evaluatePotential(eval_point);
+            double direct = fields::potential<d>(sources, eval_point);
+            double rel_error = std::abs(fmm - direct) / (std::abs(direct) + 1e-14); // avoid 0-divide
+
+            // Clamp to a minimum nonzero value before taking log10 to avoid -inf (same value)
+            rel_error = std::max(rel_error, 1e-16);
+
+            out << x << " " << y << " " << std::log10(rel_error) << "\n";
+        }
+        out << "\n";
+    }
+    out.close();
+}
+
+// Main function to run the tests
 int main(int argc, char *argv[])
 {
-    std::string mode = "sweep_items_per_leaf"; // Default mode
+    std::string mode = "spatial_error_map"; // set mode here
     if (argc > 1)
         mode = argv[1];
 
@@ -235,6 +279,30 @@ int main(int argc, char *argv[])
                              "fmm_accuracy_vs_items_per_leaf.txt");
         std::cout << "Items per leaf sweep complete: see fmm_accuracy_vs_items_per_leaf.txt\n";
     }
+    else if (mode == "spatial_error_map")
+    {
+        double total_mass = N * 1.0;
+        std::vector<Src> bodies = generateUniformSquare<d>(N, extent, total_mass);
+        double min_x = bodies[0].position[0], max_x = bodies[0].position[0];
+        double min_y = bodies[0].position[1], max_y = bodies[0].position[1];
+        for (const auto &b : bodies)
+        {
+            min_x = std::min(min_x, b.position[0]);
+            max_x = std::max(max_x, b.position[0]);
+            min_y = std::min(min_y, b.position[1]);
+            max_y = std::max(max_y, b.position[1]);
+        }
+        // shrink by a small epsilon
+        double margin = 0.05 * extent;
+        min_x += margin;
+        max_x -= margin;
+        min_y += margin;
+        max_y -= margin;
+        write_spatial_error_map(
+            bodies, items_per_leaf, fault_tolerance_eps, soften_eps,
+            min_x, max_x, min_y, max_y, 200, "spatial_error_map.txt");
+    }
+
     else
     {
         std::cerr << "Usage: " << argv[0] << " [integration|sweep_fault_tolerance|sweep_items_per_leaf]\n";
