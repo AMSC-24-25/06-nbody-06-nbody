@@ -5,7 +5,7 @@ import pandas as pd
 df = pd.read_csv("../openmp_runtime_different_threads.csv")
 
 # Filter for a specific body count (e.g. 500, 1000)
-body_count = 500
+body_count = 5000
 df = df[df["Bodies"] == body_count]
 
 # Sort by thread count to make the plot nice

@@ -93,7 +93,10 @@ int main()
     //     {"C", 1.0, 0.0, 0.0, -2 * 0.3068934205, -2 * 0.1255065670}};
     std::vector<PlanetData> planets;
     // std::ifstream in("generated_bodies.txt");
-    std::ifstream in("GeneratedBodies/generated_bodies_500.txt");
+    // std::ifstream in("GeneratedBodies/generated_bodies_500.txt");
+    // std::ifstream in("GeneratedBodies/generated_bodies_1000.txt");
+    std::ifstream in("GeneratedBodies/generated_bodies_5000.txt");
+
     if (!in)
     {
         std::cerr << "Failed to open input file" << std::endl;
