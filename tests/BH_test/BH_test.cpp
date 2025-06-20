@@ -3,13 +3,15 @@
 #include "Quad.hpp"
 #include "BHTree.hpp"
 #include "NBodyBHSolver.hpp"
+#include "RandomBodyGenerator.hpp"
+#include "Entropy.hpp" 
 #include <iostream>
 #include <fstream>
-#include <random>
 #include <string>
 #include <vector>
+#include <iomanip>
 
-// Helper function to write positions to file for each timestep
+// Write positions (no energy) to file
 template <typename T>
 void writePositionsToFile(const std::vector<Body<T, 2>> &bodies, int timestep, std::ofstream &outFile)
 {
@@ -17,113 +19,115 @@ void writePositionsToFile(const std::vector<Body<T, 2>> &bodies, int timestep, s
     for (size_t i = 0; i < bodies.size(); ++i)
     {
         const auto &pos = bodies[i].getPosition();
-        const auto energy = bodies[i].getEnergy();
-        outFile << i << "\t" << pos[0] << "\t" << pos[1] << "\t" << energy << "\n";
+        outFile << std::setw(6) << i
+                << std::setw(15) << std::fixed << std::setprecision(8) << pos[0]
+                << std::setw(15) << std::fixed << std::setprecision(8) << pos[1]
+                << "\n";
     }
     outFile << "\n";
 }
 
+// Write total system energy (sum of body.energy) to file
 template <typename T>
-void updateEntropyGrid(const std::vector<Body<T, 2>> &bodies, std::vector<std::vector<int>> &grid,
-                       T minX, T maxX, T minY, T maxY, T invDx, T invDy)
+void writeEnergyToFile(const std::vector<Body<T, 2>> &bodies, int timestep, std::ofstream &energyFile)
 {
-    int size = grid.size();
+    T totalEnergy = 0;
     for (const auto &body : bodies)
-    {
-        auto pos = body.getPosition();
-        int i = static_cast<int>((pos[0] - minX) * invDx);
-        int j = static_cast<int>((pos[1] - minY) * invDy);
-        if (i >= 0 && i < size && j >= 0 && j < size)
-        {
-            grid[i][j]++;
-        }
-    }
+        totalEnergy += body.getEnergy();
+    energyFile << "# Timestep " << timestep << "\n";
+    energyFile << std::setprecision(12) << totalEnergy << "\n\n";
 }
 
-double computeNormalizedEntropy(const std::vector<std::vector<int>> &grid, std::size_t totalSamples, double k_B = 1.0)
+template <typename T>
+void displaySystemStats(const std::vector<Body<T, 2>> &bodies)
 {
-    double entropy = 0.0;
-    int numBins = grid.size() * grid[0].size(); // Total number of grid cells
+    T totalMass = 0;
+    T avgVelocity = 0;
+    T totalKineticEnergy = 0;
+    Vector<T, 2> centerOfMass({0, 0});
 
-    for (const auto &row : grid)
+    for (const auto &body : bodies)
     {
-        for (int count : row)
-        {
-            if (count > 0)
-            {
-                double p = static_cast<double>(count) / static_cast<double>(totalSamples);
-                entropy -= p * std::log(p);
-            }
-        }
+        totalMass += body.getMass();
+        avgVelocity += body.getVelocity().norm();
+        totalKineticEnergy += 0.5 * body.getMass() * body.getVelocity().norm() * body.getVelocity().norm();
+        centerOfMass = centerOfMass + body.getPosition() * body.getMass();
     }
 
-    double maxEntropy = std::log(static_cast<double>(numBins));
-    return (maxEntropy > 0) ? (entropy / maxEntropy) * k_B : 0.0;
+    centerOfMass = centerOfMass / totalMass;
+    avgVelocity /= bodies.size();
+
+    std::cout << "System Statistics:\n";
+    std::cout << "  Total mass: " << std::fixed << std::setprecision(3) << totalMass << "\n";
+    std::cout << "  Average velocity: " << std::fixed << std::setprecision(3) << avgVelocity << "\n";
+    std::cout << "  Total kinetic energy: " << std::scientific << std::setprecision(3) << totalKineticEnergy << "\n";
+    std::cout << "  Center of mass: (" << std::fixed << std::setprecision(3)
+              << centerOfMass[0] << ", " << centerOfMass[1] << ")\n\n";
 }
 
 int main()
 {
     using T = double;
 
-    T universeSize = 3.0;
+    // Simulation parameters
+    const int numBodies = 100;
+    const int numSteps = 10000;
+    const int outputInterval = 1000;
+    const T universeSize = 10.0;
+    const T timeStep = 1e-4;
+
     Vector<T, 2> origin({-universeSize / 2, -universeSize / 2});
     Quad<T> universe(origin, universeSize);
-
-    T timeStep = 1e-5;
     NBodyBHSolver<T> solver(universe, timeStep);
 
-    struct PlanetData
-    {
-        std::string name;
-        T mass;
-        T x;
-        T y;
-        T vx;
-        T vy;
-    };
+    std::cout << "Generating " << numBodies << " bodies...\n";
+    auto system = nbody::generateStableRing(numBodies, universeSize, 100.0, 12345, 1.0);
 
-    std::vector<PlanetData> planets = {
-        {"A", 1.0, -1.0, 0.0, 0.3068934205, 0.1255065670},
-        {"B", 1.0, 1.0, 0.0, 0.3068934205, 0.1255065670},
-        {"C", 1.0, 0.0, 0.0, -2 * 0.3068934205, -2 * 0.1255065670}};
+    for (const auto &body : system.bodies)
+        solver.addBody(body);
 
-    // std::vector<PlanetData> planets = {
-    //     {"A", 1.0, -1.0, 0.0, 0.3471168881, 0.5327249454},
-    //     {"B", 1.0, 1.0, 0.0, 0.3471168881, 0.5327249454},
-    //     {"C", 1.0, 0.0, 0.0, -2 * 0.3471168881, -2 * 0.5327249454}};
+    displaySystemStats(solver.getBodies());
 
-    for (const auto &planet : planets)
-    {
-        Vector<T, 2> position({planet.x, planet.y});
-        Vector<T, 2> velocity({planet.vx, planet.vy});
-        solver.addBody(Body<T, 2>(planet.mass, position, velocity));
-    }
-
-    std::ofstream outFile("../particle_positions.txt");
-    if (!outFile)
-    {
-        std::cerr << "Failed to open output file" << std::endl;
-        return 1;
-    }
-
+    std::ofstream posFile("../particle_positions.txt");
+    std::ofstream energyFile("../energy_evolution.txt");
     std::ofstream entropyFile("../entropy_log.txt");
-    if (!entropyFile)
+    if (!posFile || !energyFile || !entropyFile)
     {
-        std::cerr << "Failed to open entropy file" << std::endl;
+        std::cerr << "Failed to open output files" << std::endl;
         return 1;
     }
+
+    // Write headers
+    posFile << "# N-Body Simulation Particle Positions\n";
+    posFile << "# Format: ParticleID\tX\tY\n";
+    posFile << "# Number of particles: " << numBodies << "\n";
+    posFile << "# Time step: " << timeStep << "\n";
+    posFile << "# Universe size: " << universeSize << "\n";
+    posFile << "# Total steps: " << numSteps << "\n\n";
+
+    energyFile << "# N-Body Simulation Energy Evolution\n";
+    energyFile << "# Format: TotalEnergy\n";
+    energyFile << "# Number of particles: " << numBodies << "\n";
+    energyFile << "# Time step: " << timeStep << "\n";
+    energyFile << "# Universe size: " << universeSize << "\n";
+    energyFile << "# Total steps: " << numSteps << "\n\n";
+
     entropyFile << "# Step\tEntropy\n";
 
-    const int numParticles = planets.size();
-    outFile << "# Format: ParticleID\tX\tY\tE\n";
-    outFile << "# Number of particles: " << numParticles << "\n\n";
+    std::cout << "Starting N-Body simulation with Barnes-Hut algorithm\n";
+    std::cout << "Configuration:\n";
+    std::cout << "  Bodies: " << numBodies << "\n";
+    std::cout << "  Steps: " << numSteps << "\n";
+    std::cout << "  Time step: " << timeStep << "\n";
+    std::cout << "  Universe size: " << universeSize << "\n";
+    std::cout << "  Output interval: " << outputInterval << "\n\n";
 
-    const int numSteps = 1000000;
-    std::cout << "Starting simulation with " << numParticles << " particles for " << numSteps << " steps\n";
-
+    // Initial state
     solver.calculateEnergy();
-    writePositionsToFile(solver.getBodies(), 0, outFile);
+    writePositionsToFile(solver.getBodies(), 0, posFile);
+    writeEnergyToFile(solver.getBodies(), 0, energyFile);
 
+    // --- Entropy grid setup ---
     const int gridSize = 1000;
     std::vector<std::vector<int>> entropyGrid(gridSize, std::vector<int>(gridSize, 0));
     std::size_t sampleCount = 0;
@@ -139,23 +143,35 @@ int main()
     {
         solver.simulateOneStep();
 
+        // Update entropy grid for all particles
         updateEntropyGrid(solver.getBodies(), entropyGrid, minX, maxX, minY, maxY, invDx, invDy);
         sampleCount += solver.getBodies().size();
 
-        if (step % 1000 == 0)
+        if (step % outputInterval == 0)
         {
             solver.calculateEnergy();
-            writePositionsToFile(solver.getBodies(), step, outFile);
-            std::cout << "Completed step " << step << "/" << numSteps << "\n";
+            writePositionsToFile(solver.getBodies(), step, posFile);
+            writeEnergyToFile(solver.getBodies(), step, energyFile);
 
             double entropy = computeNormalizedEntropy(entropyGrid, sampleCount);
             entropyFile << step << "\t" << entropy << "\n";
+
+            double progress = (double)step / numSteps * 100.0;
+            std::cout << "Step " << std::setw(6) << step
+                      << "/" << numSteps
+                      << " (" << std::fixed << std::setprecision(1) << progress << "%)\n";
         }
     }
 
-    outFile.close();
+    posFile.close();
+    energyFile.close();
     entropyFile.close();
 
-    std::cout << "Simulation complete. Results written to particle_positions.txt\n";
+    std::cout << "\nSimulation completed successfully!\n";
+    std::cout << "Results written to particle_positions.txt, energy_evolution.txt, and entropy_log.txt\n";
+
+    std::cout << "\nFinal ";
+    displaySystemStats(solver.getBodies());
+
     return 0;
 }

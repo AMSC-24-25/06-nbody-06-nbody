@@ -1,0 +1,40 @@
+# N-Body Simulation Energy Evolution
+# Format: TotalEnergy
+# Number of particles: 100
+# Time step: 0.0001
+# Universe size: 10
+# Total steps: 10000
+
+# Timestep 0
+-554.189074327
+
+# Timestep 1000
+-585.847700801
+
+# Timestep 2000
+-555.219493896
+
+# Timestep 3000
+-555.364700241
+
+# Timestep 4000
+-556.001390495
+
+# Timestep 5000
+-564.120094463
+
+# Timestep 6000
+-610.422335333
+
+# Timestep 7000
+-563.069688409
+
+# Timestep 8000
+-558.515416472
+
+# Timestep 9000
+-561.876252512
+
+# Timestep 10000
+-558.132751413
+
