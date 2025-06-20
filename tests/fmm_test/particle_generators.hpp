@@ -58,4 +58,26 @@ namespace fmm
         return bodies;
     }
 
+    template <std::size_t d>
+    std::vector<Body_<d>> generateUniformSquare(
+        int N, double extent, double total_mass, unsigned int seed = 12345)
+    {
+        using Vec = Vector_<d>;
+        std::mt19937_64 rng(seed);
+        std::uniform_real_distribution<double> dist(-extent / 2.0, extent / 2.0);
+
+        std::vector<Body_<d>> bodies;
+        bodies.reserve(N);
+
+        double mass = total_mass / N;
+        for (int i = 0; i < N; ++i)
+        {
+            Vec pos{};
+            for (std::size_t j = 0; j < d; ++j)
+                pos[j] = dist(rng);
+            bodies.emplace_back(pos, mass);
+        }
+        return bodies;
+    }
+
 } // namespace fmm

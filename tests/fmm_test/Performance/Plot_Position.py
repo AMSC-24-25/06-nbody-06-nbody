@@ -28,7 +28,7 @@ def read_particle_positions(filename):
     return positions
 
 # --- Read data ---
-positions = read_particle_positions("../build/particle_positions.txt")
+positions = read_particle_positions("../build/accuracy_positions.txt")
 Nframes = len(positions)
 N = positions[0].shape[0]
 
@@ -47,6 +47,5 @@ def animate(i):
 ani = FuncAnimation(fig, animate, frames=Nframes, interval=50, blit=True)
 
 # Save as GIF
-ani.save("nbody_simulation.gif", writer=PillowWriter(fps=20))
-print("Saved as nbody_simulation.gif")
-
+ani.save("positions.gif", writer=PillowWriter(fps=20))
+print("Saved as positions.gif")
