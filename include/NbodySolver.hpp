@@ -17,7 +17,7 @@ private:
     unsigned int numBodies;
     std::vector<Body<Real, dim>> bodies;
     mutable std::vector<std::vector<Vector<Real, dim>>> forces;
-    static constexpr unsigned int epsilon = 1e-10;
+    static constexpr Real epsilon = 1e-15; // Softening factor to avoid singularities
 
     // Generic force term
     inline Vector<Real, dim> computeForce(const Body<Real, dim> &b1, const Body<Real, dim> &b2) const

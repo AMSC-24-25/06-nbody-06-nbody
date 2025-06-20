@@ -47,7 +47,7 @@ void NbodySolver::step(const Real &deltaT)
             forces[i][q] = Vector<Real, dim>();
         }
 
-        // Leapfrog integrator
+        // Leapfrog KDK integrator
         bodies[q].setAcceleration(totForce / bodies[q].getMass());
         bodies[q].updateVelocity(bodies[q].getAcceleration() * deltaT);
         bodies[q].updatePosition(bodies[q].getVelocity() * deltaT);
