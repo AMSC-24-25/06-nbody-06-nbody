@@ -10,6 +10,9 @@ typedef NBodyBHSolverOpenMP<double> SolverType;
 #include <string>
 #include <vector>
 
+#include <chrono>
+#include <omp.h>       // For omp_get_max_threads()
+
 // Helper function to write positions to file for each timestep
 template <typename T>
 void writePositionsToFile(const std::vector<Body<T, 2>> &bodies, int timestep, std::ofstream &outFile)
@@ -89,7 +92,14 @@ int main()
     //     {"B", 1.0, 1.0, 0.0, 0.3068934205, 0.1255065670},
     //     {"C", 1.0, 0.0, 0.0, -2 * 0.3068934205, -2 * 0.1255065670}};
     std::vector<PlanetData> planets;
-    std::ifstream in("generated_bodies.txt");
+    // std::ifstream in("generated_bodies.txt");
+    std::ifstream in("GeneratedBodies/generated_bodies_500.txt");
+    if (!in)
+    {
+        std::cerr << "Failed to open input file" << std::endl;
+        return 1;
+    }
+    
     double mass, x, y, vx, vy;
     int id = 0;
 
@@ -135,9 +145,10 @@ int main()
     outFile << "# Format: ParticleID\tX\tY\tE\n";
     outFile << "# Number of particles: " << numParticles << "\n\n";
 
-    const int numSteps = 1000000;
-    // const int numSteps = 10000;  // when test using small number of steps
+    // const int numSteps = 1000000;
+    const int numSteps = 10000;  // when test using small number of steps
     std::cout << "Starting simulation with " << numParticles << " particles for " << numSteps << " steps\n";
+    auto start = std::chrono::high_resolution_clock::now();
 
     solver.calculateEnergy();
     writePositionsToFile(solver.getBodies(), 0, outFile);
@@ -175,5 +186,30 @@ int main()
     entropyFile.close();
 
     std::cout << "Simulation complete. Results written to particle_positions_openmp.txt\n";
+
+    auto end = std::chrono::high_resolution_clock::now();
+    double duration = std::chrono::duration<double>(end - start).count();
+
+    int threads = omp_get_max_threads();  // Number of OpenMP threads
+    int body_count = planets.size();
+
+    // Append to CSV file
+    std::ifstream checkExist("../openmp_runtime_different_threads.csv");
+    bool file_exists = checkExist.good();
+    checkExist.close();
+
+    std::ofstream csvFile("../openmp_runtime_different_threads.csv", std::ios::app);
+    if (csvFile.is_open()) {
+        if (!file_exists) {
+            csvFile << "Bodies,Threads,TimePerStep\n";  // header
+        }
+        double time_per_step = duration / numSteps;
+        csvFile << body_count << "," << threads << "," << time_per_step << "\n";
+        csvFile.close();
+    } else {
+        std::cerr << "Failed to open CSV file.\n";
+    }
+
+    std::cout << "Total simulation time: " << duration << " seconds using " << threads << " OpenMP threads.\n";
     return 0;
 }
