@@ -1,6 +1,7 @@
 ## **Goal**
 
 Based on the same algorithm (Leapfrog), we want to know how much it can accelerate if we use **CUDA** instead of the basic **CPU** version and **OpenMP** version.
+And we can also have a straight look at the performance of the general CUDA version  with number of particles changing.
 
 ---
 
@@ -36,8 +37,12 @@ We use every thread to compute the entire acceleration of every particle.
 
 > **Table:** Time Cost Per Step  — CUDA vs OpenMP vs Basic Version
 ---
+## **The Performance of General CUDA Version(delta t=0.01 T=1000)**
+
+![Image from Google Drive](https://drive.google.com/uc?export=view&id=10GW4k5xvE4f31hYeSNIj991mx1hqKWKi)
+---
 Based on the cuda run time is not very stable, we run the program several times and calculate the average value.
-We can see from the table that when the number of particles is large, the advantage of CUDA is obvious.
+We can see from the table that when the number of particles is going large, the advantage of CUDA becomes obvious.
 ## **Possible Ways to Improve**
 
 1. Merge possible kernels  
