@@ -1,39 +1,65 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Read the data (skip comment/header lines)
-data = np.loadtxt("../build/integration_efficiency.txt", comments='#')
-N = data[:, 0]
-total_time_ms = data[:, 1]
-avg_time_ms = data[:, 2]
+filename = "../build/integration_efficiency.txt"
+
+# --- Read the mode ---
+with open(filename, 'r') as f:
+    first_line = f.readline()
+    while first_line.strip() == '' or not first_line.startswith("# mode:"):
+        first_line = f.readline()
+    mode = first_line.strip().split(":")[1].strip()
+    while True:
+        header = f.readline()
+        if not header:
+            raise RuntimeError("File ended before header found!")
+        if header.startswith("#"):
+            columns = header.strip().strip("#").split()
+            break
+
+# --- Load the data ---
+data = np.loadtxt(filename, comments='#')
+col_idx = {col: i for i, col in enumerate(columns)}
+avg_time_ms = data[:, col_idx['avg_time_per_step_ms']]
 
 plt.figure(figsize=(8, 5))
 
-# Plot your actual measured times
-plt.plot(N, total_time_ms, 'o-', label='Total Time (ms)')
-plt.plot(N, avg_time_ms, 's-', label='Average Time per Step (ms)')
+if mode == "N":
+    x = data[:, col_idx['N']]
+    xlabel = 'Number of Particles $N$'
+    plot_title = 'Average FMM Step Time vs. $N$'
+    plt.xscale('log')
+    plt.yscale('log')
+elif mode == "items_per_leaf":
+    x = data[:, col_idx['items_per_leaf']]
+    xlabel = 'Items per Leaf'
+    plot_title = 'Average FMM Step Time vs. Items per Leaf'
+elif mode == "eps":
+    x = data[:, col_idx['eps']]
+    xlabel = 'Fault Tolerance $\epsilon$'
+    plot_title = 'Average FMM Step Time vs. Fault Tolerance'
+    plt.xscale('log')
+    plt.gca().invert_xaxis()
+else:
+    raise ValueError("Unknown mode: {}".format(mode))
 
-plt.xscale('log')
-plt.yscale('log')
-plt.xlabel('Number of Particles $N$', fontsize=14)
-plt.ylabel('Time (ms)', fontsize=14)
-plt.title('FMM Integration Efficiency vs. Number of Particles', fontsize=15)
+plt.plot(x, avg_time_ms, 'o-', label='Average Time per Step (ms)')
+
+if mode == "N":
+    # O(N) reference curve
+    cN = avg_time_ms[0] / x[0]
+    O_N = cN * x
+    plt.plot(x, O_N, '--', color='gray', label='$\mathcal{O}(N)$ reference')
+
+    # O(N log N) reference curve
+    cNlogN = avg_time_ms[0] / (x[0] * np.log2(x[0]))
+    O_NlogN = cNlogN * x * np.log2(x)
+    plt.plot(x, O_NlogN, '--', color='red', label='$\mathcal{O}(N \log N)$ reference')
+
+plt.xlabel(xlabel, fontsize=14)
+plt.ylabel('Time per Step (ms)', fontsize=14)
+plt.title(plot_title, fontsize=15)
 plt.grid(True, which='both', ls='--', alpha=0.6)
-
-# Set x-ticks for exact N values (integers)
-plt.xticks(N, [str(int(n)) for n in N])
-
-# --- O(N) reference ---
-cN = total_time_ms[0] / N[0]
-O_N = cN * N
-plt.plot(N, O_N, '--', color='gray', label='$\mathcal{O}(N)$ reference')
-
-# --- O(N log N) reference ---
-cNlogN = total_time_ms[0] / (N[0] * np.log2(N[0]))
-O_NlogN = cNlogN * N * np.log2(N)
-plt.plot(N, O_NlogN, '--', color='red', label='$\mathcal{O}(N \log N)$ reference')
-
 plt.legend()
 plt.tight_layout()
-plt.savefig("integration_efficiency_scaling.png", dpi=150)
-
+plt.savefig(f"integration_efficiency_{mode}.png", dpi=150)
