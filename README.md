@@ -5,7 +5,7 @@ This branch contains a **multithreaded CPU implementation** of the N-Body simula
 
 ## 🧠 Description
 
-- Organizes space into a tree (e.g., quad-tree in 2D, octree in 3D) for grouping distant particles.
+- Organizes space into a tree (e.g., quad-tree in 2D, octree in 3D) for grouping distant particles. This branch uses a 2D quad-tree implementation.
 - Distant particle groups are treated as single "pseudo-particles" using their center of mass.
 
 ## 🧪 How to Run
@@ -20,11 +20,20 @@ There are various already-made code snippets in the `tests` folder.
 To build them, go in the appropriate folder and run the following:
 
 ```bash
-mkdir build
-cd build
-cmake ..
-make
-./<executable name>
+# 1.	Generate the initial condition file (e.g., for 5000 bodies):
+g++ GenerateBodies.cpp -o generate_bodies
+./generate_bodies 5000 generated_bodies_5000.txt
+
+# 2.	Compile and run the OpenMP-based simulation:
+g++-14 -fopenmp -O2 BH_test_openmp.cpp -I../../include -o bh_openmp
+OMP_NUM_THREADS=1 ./bh_openmp
+OMP_NUM_THREADS=2 ./bh_openmp
+OMP_NUM_THREADS=4 ./bh_openmp
+OMP_NUM_THREADS=8 ./bh_openmp
+OMP_NUM_THREADS=16 ./bh_openmp
+
+# 3.	Plot runtime performance using the generated CSV:
+python3 Plot_openmp_threads.py
 ```
 
 To make your own tests, modify the *CMakeListsTemplate.txt* file accordingly.
@@ -53,10 +62,10 @@ Where:
 - `xK yK` is the k-th body initial position  
 - `vxK vyK` is the k-th body initial velocity
 
-Some examples for initial conditions can be found in the folder *initial_conditions*.
 
 ### 🔎 Output
 
 The program can output:
 - Position of each body per timestep  
 - Total energy per timestep
+- CSV summary files for plotting performance metrics
