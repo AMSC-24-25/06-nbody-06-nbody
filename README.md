@@ -12,7 +12,7 @@ The basic dependencies can be installed under Ubuntu by running
 sudo apt install build-essential libsdl2-dev libglew-dev
 ```
 
-Detailed installation instructions for the CUDA Toolkit can be found ![here](https://developer.nvidia.com/cuda-downloads).
+Detailed installation instructions for the CUDA Toolkit can be found at [here](https://developer.nvidia.com/cuda-downloads).
 
 ## Building
 
@@ -41,13 +41,29 @@ Drag to orbit the camera around the origin, and scroll to zoom. Pressing `o` key
 |:--------:|:-------:|
 | Basic visualization | Octree visualization |
 
-#### Self-gravitating disk of 262k bodies 
+| ![](disk.png) |  ![](shell-galaxy.png) |
+|:--------:|:-------:|
+| Self-gravitating disk of 262,144 particles | Cold collapse of uniform sphere |
 
-![](disk.png)
+| ![](disk.gif) |  ![](2disks.gif) |
+|:--------:|:-------:|
+| Disk of 524,288 particles running at ~37 FPS (θ=0.75) | Two disks of 262,144 particles each running at ~30 FPS (θ=0.75) |
 
-#### Two self-gravitating disks of 262k bodies
+### 2,097,152 particles at ~150ms per step (θ=0.6)
 
-![](2disks.gif)
+![](2mln-explosion.gif)
+
+An additional video can be found [here](https://drive.google.com/file/d/1YTa5hYdYPj_kloaZWec7PzCBgfg7Z7SG/view?usp=sharing).
+
+## Bibliography
+
+- Tero Karras. 2012. Maximizing parallelism in the construction of BVHs, octrees, and k-d trees. In Proceedings of the Fourth ACM SIGGRAPH / Eurographics conference on High-Performance Graphics (EGGH-HPG'12). Eurographics Association, Goslar, DEU, 33–37.
+
+- Robin Cazalbou, Florent Duchaine, Eric Quémerais, Bastien Andrieu, Gabriel Staffelbach, and Bruno Maugars. 2024. Hybrid Multi-GPU Distributed Octrees Construction for Massively Parallel Code Coupling Applications. In Proceedings of the Platform for Advanced Scientific Computing Conference (PASC '24). Association for Computing Machinery, New York, NY, USA, Article 14, 1–11. https://doi.org/10.1145/3659914.3659928
+
+- Jeroen Bédorf, Evghenii Gaburov, and Simon Portegies Zwart. 2012. A sparse octree gravitational N-body code that runs entirely on the GPU processor. Journal of Computational Physics 231, 7 (2012), 2825–2839. DOI:https://doi.org/https://doi.org/10.1016/j.jcp.2011.12.024
+
+
 
 ## TODO
 
