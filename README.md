@@ -1,58 +1,62 @@
-# Numerical N-Body Solution
-## Introduction
-In an n-body problem, we need to find the positions and velocities of a collection of
-interacting particles over a period of time. For example, an astrophysicist might want
-to know the positions and velocities of a collection of stars, while a chemist might
-want to know the positions and velocities of a collection of molecules or atoms. An
-n-body solver is a program that finds the solution to an n-body problem by simulating
-the behavior of the particles.
 
-## First formulation
-We started our developing from an n-body solver that simulates the motions
-of planets or stars.<br />
-That is, the force excerted on particle $`q`$ by particle $`p`$ is given by
-```math
-\vec{f}_{q,p}(t)=-G\frac{m_qm_p}{\left|\vec{s}_q(t)-\vec{s}_p(t)\right|^3}\left[\vec{s}_q(t)-\vec{s}_p(t)\right]
-```
-where $`G`$ is the Gravitational constant ($`\approx 6.7\times 10^{−11}`$)<br/><br/>
-The total force acting on a particle is therefore
-```math
-\vec{F}_q(t)=\sum_{i\neq q}^{N}\vec{f}_{q,i}(t)
-```
-From Newton's second law, we can compute the particles acceleration as
-```math
-\vec{a}_q(t) = \frac{\vec{F}_q(t)}{m_q}
-```
-Using a first-order integration scheme (in this case Forward Euler) we can compute the updated velocities and positions at time $`t+\Delta t`$
-```math
-\vec{s}_q(t+\Delta t)\approx \vec{s}_q(t)+\Delta t\vec{v}_q(t)
-```
-```math
-\vec{v}_q(t+\Delta t)\approx \vec{v}_q(t)+\Delta t\vec{a}_q(t)
+# 🌌 Barnes-Hut method using OpenMP
+
+This branch contains a **multithreaded CPU implementation** of the N-Body simulation using OpenMP with the Barnes-Hut method.
+
+## 🧠 Description
+
+- Organizes space into a tree (e.g., quad-tree in 2D, octree in 3D) for grouping distant particles.
+- Distant particle groups are treated as single "pseudo-particles" using their center of mass.
+
+## 🧪 How to Run
+
+### 🔧 Prerequisites
+
+- A C++ compiler with OpenMP support (e.g., `g++` or `clang++`)
+
+### 🛠️ Compilation
+
+There are various already-made code snippets in the `tests` folder.  
+To build them, go in the appropriate folder and run the following:
+
+```bash
+mkdir build
+cd build
+cmake ..
+make
+./<executable name>
 ```
 
-## Optimizations
-### Computation of forces
-Using Newton's third law, we can halve the amount of forces computed, since
-```math
-\vec{f}_{p,q}(t)=-\vec{f}_{q,p}(t)
+To make your own tests, modify the *CMakeListsTemplate.txt* file accordingly.
+
+### 📄 Input File Format
+
+The input file for initial positions should contain:
+
 ```
-### Better integration Scheme
-The Forward Euler scheme, being first-order, performs bad in terms of accuracy when the $`\Delta t`$ is not extremely small. 
-It's therefore crucial to choose a better integration scheme for the computation of the velocities and positions.<br />
-As a first optimization, we used a Leapfrog KDK scheme, which is second order, and is composed as follows:
-```math
-\vec{v}_q(t+\frac{\Delta t}{2}) = \vec{v}_q(t)+\vec{a}_q(t)\frac{\Delta t}{2}
-```
-```math
-\vec{s}_q(t+\Delta t) = \vec{s}_q(t) + \Delta t \vec{v}_q(t+\frac{\Delta t}{2})
-```
-```math
-\vec{v}_q(t+\Delta t) = \vec{v}_q(t+\frac{\Delta t}{2})+\vec{a}_q(t+\Delta t)\frac{\Delta t}{2}
+N
+m1
+x1 y1
+vx1 vy1
+m2
+x2 y2
+vx2 vy2
+...
+mN
+xN yN
+vxN vyN
 ```
 
-## Results
-(parameters taken from [Periodic Planar Three Body Orbits](https://observablehq.com/@rreusser/periodic-planar-three-body-orbits))
+Where:
+- `N` is the number of particles  
+- `mK` is the k-th body mass  
+- `xK yK` is the k-th body initial position  
+- `vxK vyK` is the k-th body initial velocity
 
-![I.A. i.c. 1](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/solver/tests/animations/three-IA-ic-1.gif)
-![SS - LET](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/solver/tests/animations/three-sheen-LET.gif)
+Some examples for initial conditions can be found in the folder *initial_conditions*.
+
+### 🔎 Output
+
+The program can output:
+- Position of each body per timestep  
+- Total energy per timestep
