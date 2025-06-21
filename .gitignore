@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# Build files
+build/
+
+# MacOS doing MacOS things
+.DS_Store
