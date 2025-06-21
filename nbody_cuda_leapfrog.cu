@@ -132,6 +132,7 @@ void run_simulation(std::vector<Particle>& h_bodies, Real deltaT, int steps, con
         if (err2 != cudaSuccess) {
             std::cerr << "update_bodies_kernel launch failed: " << cudaGetErrorString(err2) << std::endl;
         }
+        cudaMemcpy(h_bodies.data(), d_bodies, sizeof(Particle) * numBodies, cudaMemcpyDeviceToHost);
         energyOut << step << "," << computeEnergy(h_bodies, numBodies) << '\n';
         if (step % 10 == 0)
         {
