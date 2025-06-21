@@ -11,12 +11,11 @@ The N-Body problem simulates the motion of a system of particles under mutual gr
 The repository is organized into multiple branches, each containing a specific implementation:
 
 - 🧮 **`naive-openmp`** – Basic OpenMP implementation using the Naive method. For reference.
-- 🚀 **`gpu-cuda`** – CUDA implementation leveraging GPU acceleration.
-- 🔁 **`gpu-opencl`** – OpenCL implementation for cross-platform GPU execution.
-- 📏 **`cpu-vectorized`** – CPU SIMD-vectorized implementation using intrinsics or compiler autovectorization.
-- 📊 **`visualization`** – Tool to visualize the results
+- 🚀 **`naive-cuda`** – CUDA implementation using the Naive method.
+- 🧮 **`bh-openmp`** – OpenMP implementation using the Barnes-Hut method.
+- 🚀 **`bh-cuda`** – CUDA implementation using the Barnes-Hut method.
+- 🧮 **`fmm`** – Fast multipole method
 
-*(Customize or update the branch list above according to your actual repo structure.)*
 
 ## 📄 Report
 
