@@ -13,14 +13,14 @@ The repository is organized into multiple branches, each containing a specific i
 - 🧮 **`naive-openmp`** – Basic OpenMP implementation using the Naive method. For reference.
 - 🚀 **`naive-cuda`** – CUDA implementation using the Naive method.
 - 🧮 **`bh-openmp`** – OpenMP implementation using the Barnes-Hut method.
-- 🚀 **`bh-cuda`** – CUDA implementation using the Barnes-Hut method.
+- 🚀 **`bh-cuda`** – Real-time CUDA implementation using the Barnes-Hut method and OpenGL rendering.
 - 🧮 **`fmm`** – Fast multipole method
 
 
 ## 📄 Report
 
 A detailed report discussing the design choices, performance evaluations, and results of the simulations can be found at:  
-👉 **[*link*](#)**
+👉 **[*link*](AMSC_Project_Report___Group_6.pdf)**
 
 ## 👥 Authors
 
