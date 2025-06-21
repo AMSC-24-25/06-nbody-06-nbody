@@ -21,8 +21,7 @@ We use every thread to compute the entire acceleration of every particle.
 
 ## **The Energy Stability of CUDA Version**
 
-![Image from Google Drive](https://drive.google.com/uc?export=view&id=1-5S1qt4WS4UZPgrP3HfeLqwucbCD8C0k)
-
+![Image from Google Drive](https://drive.google.com/uc?export=view&id=1-zlwowYJMSbtBiSmmm2DctkPFi5_Eg6P)
 ---
 
 ## **Benchmark**
