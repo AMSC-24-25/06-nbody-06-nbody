@@ -1,12 +1,12 @@
-# ⚙️ Naive method using OpenMP
+
+# 🌌 Naive Method using OpenMP
 
 This branch contains a **multithreaded CPU implementation** of the N-Body simulation using OpenMP with the Naive method.
 
-## ⚙️ Description
+## 🧠 Description
 
-- Computes all the pairwise energies
+- Computes all the pairwise energies  
 - Parallelizes force calculations across multiple CPU threads.
-
 
 ## 🧪 How to Run
 
@@ -16,8 +16,8 @@ This branch contains a **multithreaded CPU implementation** of the N-Body simula
 
 ### 🛠️ Compilation
 
-There are various already-made code snippets in the `tests` folder.
-To build them, go in the appropriate folder and run the following
+There are various already-made code snippets in the `tests` folder.  
+To build them, go in the appropriate folder and run the following:
 
 ```bash
 mkdir build
@@ -27,7 +27,7 @@ make
 ./<executable name>
 ```
 
-To make your own tests, modify the *CMakeListsTemplate.txt* file accordingly
+To make your own tests, modify the *CMakeListsTemplate.txt* file accordingly.
 
 ### 📄 Input File Format
 
@@ -48,15 +48,15 @@ vxN vyN
 ```
 
 Where:
-- `N` is the number of particles
-- `mK` is the k-th body mass
-- `xK yK` is the k-th body intial position
-- `vxK vyK` is the k-th body intial velocity
+- `N` is the number of particles  
+- `mK` is the k-th body mass  
+- `xK yK` is the k-th body initial position  
+- `vxK vyK` is the k-th body initial velocity
 
-Some example for initial conditions can be found in the folder *initial_conditions*
+Some examples for initial conditions can be found in the folder *initial_conditions*.
 
-### 🧯 Output
+### 🔎 Output
 
 The program can output:
-- Position of each body per timestep
+- Position of each body per timestep  
 - Total energy per timestep
