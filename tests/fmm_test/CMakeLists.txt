@@ -70,7 +70,13 @@ add_executable(accuracy_test ${ACCURACY_SRC})
 target_link_libraries(accuracy_test stdc++fs ${GSL_LIBRARIES})
 target_sources(accuracy_test PRIVATE ${HEADER_FILES})
 
-# --- Custom run/valgrind/perf targets for both ---
+# --- efficiency_test target (in Performance folder) ---
+set(EFFICIENCY_SRC Performance/efficiency_test.cpp)
+add_executable(efficiency_test ${EFFICIENCY_SRC})
+target_link_libraries(efficiency_test stdc++fs ${GSL_LIBRARIES})
+target_sources(efficiency_test PRIVATE ${HEADER_FILES})
+
+# --- Custom run/valgrind/perf targets for each binary ---
 add_custom_target(run
     COMMAND ${CMAKE_CURRENT_BINARY_DIR}/integrator_leapfrog_2d
     DEPENDS integrator_leapfrog_2d
@@ -82,6 +88,12 @@ add_custom_target(run_accuracy
     DEPENDS accuracy_test
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Running accuracy_test"
+)
+add_custom_target(run_efficiency
+    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/efficiency_test
+    DEPENDS efficiency_test
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Running efficiency_test"
 )
 
 add_custom_target(valgrind
@@ -96,6 +108,12 @@ add_custom_target(valgrind_accuracy
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Valgrind accuracy_test"
 )
+add_custom_target(valgrind_efficiency
+    COMMAND valgrind --leak-check=full --track-origins=yes ${CMAKE_CURRENT_BINARY_DIR}/efficiency_test
+    DEPENDS efficiency_test
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Valgrind efficiency_test"
+)
 
 add_custom_target(perf
     COMMAND perf stat -r 10 ${CMAKE_CURRENT_BINARY_DIR}/integrator_leapfrog_2d
@@ -108,6 +126,12 @@ add_custom_target(perf_accuracy
     DEPENDS accuracy_test
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Perf accuracy_test"
+)
+add_custom_target(perf_efficiency
+    COMMAND perf stat -r 10 ${CMAKE_CURRENT_BINARY_DIR}/efficiency_test
+    DEPENDS efficiency_test
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Perf efficiency_test"
 )
 
 add_custom_target(clean-logs
