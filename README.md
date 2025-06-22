@@ -37,18 +37,6 @@ The program can be executed by running
 
 Drag to orbit the camera around the origin, and scroll to zoom. Pressing `o` toggles the octree visualization, `space` pauses/resumes the simulation, `1`, `2` and `3` spawn the particles in different initial configurations.
 
-## Plots
-
-| ![](plots/disk-energy-32k-eps0.01-dt0.001.png) |  ![](plots/disk-acc-32k-eps0.01-dt0.001.png) |
-|:--------:|:-------:|
-| Total energy for 32,768 particles | Relative acceleration error for 32,768 particles |
-
-| ![](plots/exec-build-traversal-stacked.png) |  ![](plots/exec-scaling.png) |
-|:--------:|:-------:|
-| Execution time of a single step for θ=0.75 | Scalability for different values of θ (log-log) |
-
-Detailed information can be found in Section 3.1 of the ![report](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/AMSC_Project_Report___Group_6.pdf).
-
 ## Gallery
 
 | ![](screenshots/disk.png) |  ![](screenshots/shell-galaxy.png) |
@@ -62,6 +50,19 @@ Detailed information can be found in Section 3.1 of the ![report](https://github
 | ![](screenshots/disk.gif) |  ![](screenshots/2disks.gif) |
 |:--------:|:-------:|
 | Disk of 524,288 particles running at ~37 FPS (θ=0.75) | Two disks of 262,144 particles each running at ~30 FPS (θ=0.75) |
+
+## Plots
+
+| ![](plots/disk-energy-32k-eps0.01-dt0.001.png) |  ![](plots/disk-acc-32k-eps0.01-dt0.001.png) |
+|:--------:|:-------:|
+| Total energy for 32,768 particles | Relative acceleration error for 32,768 particles |
+
+| ![](plots/exec-build-traversal-stacked.png) |  ![](plots/exec-scaling.png) |
+|:--------:|:-------:|
+| Execution time of a single step for θ=0.75 | Scalability for different values of θ (log-log) |
+
+Detailed information can be found in Section 3.1 of the ![report](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/AMSC_Project_Report___Group_6.pdf).
+
 
 ### 2,097,152 particles at ~150ms per step (θ=0.6)
 
