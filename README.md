@@ -118,11 +118,14 @@ Finally, the entropy evaluation shows that the system reaches a stable state aft
 
 ### Example Output For OpenMP Version
 
-The OpenMP version has the better performance so that need to precess the large number of bodies, e.g., 5000 bodies, and the results can be found in the related files wiht openmp mark like
-the energy plot is `energy_evolution_openmp.png` like this:
+The OpenMP version has the better performance so that need to precess the large number of bodies, e.g., 5000 bodies, and the results can be found in the related files with openmp mark.
+
+- **Correctness:**
+  the energy plot `energy_evolution_openmp.png` is tested with 50 collisionless bodies to verify the correctness of the OpenMP version, which is similar to the serial version, showing that the total energy is conserved over time.
 
 ![Energy Evaluation OpenMP](tests/BH_test/energy_evolution_openmp.png)
 
-Anyway, after comfiming the correctness of the OpenMP version, we focus more on the performance part like the runtime performance with different number of threads, which can be found in the `BH_test\OpenmpRuntime` folder, and the runtime performance plot is like this for 5000 bodies and 32 threads:
+- **Performance:**
+  Anyway, after comfiming the correctness of the OpenMP version, we focus more on the performance part like the runtime performance with larger number of bodies and different number of threads, which can be found in the `BH_test\OpenmpRuntime` folder, and the runtime performance plot is like this for 5000 bodies and 32 threads:
 
 ![OpenMP Runtime Performance](tests/BH_test/OpenmpRuntime/openmp_time_per_step_5000bodies.png)
