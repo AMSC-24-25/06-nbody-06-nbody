@@ -68,3 +68,9 @@ The project is organized as follows:
 And the tree related classes have this kind of structure:
 
 ![The Tree Files Relationship](tree.png)
+
+## 6. Show some results
+
+We can generate uniform distribution of bodies in a 2D square space with all the initial velocity is 0. Run the `integrator_leapfrog_2d` and we will see this gif:
+
+![N-body Simulation Animation](Integration/nbody_simulation.gif)
