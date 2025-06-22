@@ -12,9 +12,9 @@ The repository is organized into multiple branches, each containing a specific i
 
 - [`naive-openmp`](https://github.com/AMSC-24-25/06-nbody-06-nbody/tree/naive-openmp) - Basic OpenMP implementation using the Naive method. For reference.
 - [`naive-cuda`](https://github.com/AMSC-24-25/06-nbody-06-nbody/tree/naive-cuda) - CUDA implementation using the Naive method.
-- [`bh-openmp`](https://github.com/AMSC-24-25/06-nbody-06-nbody/tree/bh-openmp) - OpenMP implementation using the Barnes-Hut method.
+- [`bh-openmp`](https://github.com/AMSC-24-25/06-nbody-06-nbody/tree/bh-openmp) - Both the serial and OpenMP verison implementation using the Barnes-Hut method.
 - [**`bh-cuda`**](https://github.com/AMSC-24-25/06-nbody-06-nbody/tree/bh-cuda) - **Real-time CUDA implementation using the Barnes-Hut method and OpenGL rendering.**
-- [**`fmm`**](https://github.com/AMSC-24-25/06-nbody-06-nbody/tree/FMM) - **Fast multipole method implementation.**
+- [**`fmm`**](https://github.com/AMSC-24-25/06-nbody-06-nbody/tree/FMM) - **Fast multipole method implementation with openmp parallelization.**
 
 ## Report
 
