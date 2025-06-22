@@ -37,15 +37,27 @@ The program can be executed by running
 
 Drag to orbit the camera around the origin, and scroll to zoom. Pressing `o` toggles the octree visualization, `space` pauses/resumes the simulation, `1`, `2` and `3` spawn the particles in different initial configurations.
 
-## Gallery
+## Plots
 
-| ![](screenshots/spinning.png) |  ![](screenshots/spinning-octree.png) |
+| ![](plots/disk-energy-32k-eps0.01-dt0.001.png) |  ![](plots/disk-acc-32k-eps0.01-dt0.001.png) |
 |:--------:|:-------:|
-| Basic visualization | Octree visualization |
+| Total energy for 32,768 particles | Relative acceleration error for 32,768 particles |
+
+| ![](plots/exec-build-traversal-stacked.png) |  ![](plots/exec-scaling.png) |
+|:--------:|:-------:|
+| Execution time of a single step for θ=0.75 | Scalability for different values of θ (log-log) |
+
+Detailed information can be found in Section 3.1 of the ![report](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/AMSC_Project_Report___Group_6.pdf).
+
+## Gallery
 
 | ![](screenshots/disk.png) |  ![](screenshots/shell-galaxy.png) |
 |:--------:|:-------:|
 | Self-gravitating disk of 262,144 particles | Cold collapse of uniform sphere |
+
+| ![](screenshots/spinning.png) |  ![](screenshots/spinning-octree.png) |
+|:--------:|:-------:|
+| Basic visualization | Octree visualization |
 
 | ![](screenshots/disk.gif) |  ![](screenshots/2disks.gif) |
 |:--------:|:-------:|
