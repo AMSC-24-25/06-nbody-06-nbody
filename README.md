@@ -71,8 +71,10 @@ And the tree related classes have this kind of structure:
 
 ## 6. Show some results
 
-We can generate uniform distribution of bodies in a 2D square space with all the initial velocity is 0. Run the `integrator_leapfrog_2d` and we will see this gif:
+We can generate uniform distribution of bodies in a 2D square space with all the initial velocity is 0. Run the `integrator_leapfrog_2d`with $$\Delta t = 10^{-4} \qquad Steps = 10^4$$ and  we will see this gif by print every 100 steps:
 
 ![N-body Simulation Animation](tests/Integration/nbody_simulation.gif)
 
 ![The Enrgy Evolution](tests/Integration/energy_vs_time.png)
+
+- More detailed tests like accuracy and efficiency can be found in the `Performance` folder.
