@@ -25,5 +25,5 @@ plt.tight_layout()
 plt.savefig("entropy_plot.png")
 
 # Save with a dynamic name 
-output_name = "entropy_plot_openmp.png" if "openmp" in filename else "entropy_plot.png"
+output_name = "entropy_plot.png"
 plt.savefig(output_name)

@@ -6,12 +6,10 @@
 typedef NBodyBHSolverOpenMP<double> SolverType;
 #include <iostream>
 #include <fstream>
-#include <random>
 #include <string>
 #include <vector>
-
 #include <chrono>
-#include <omp.h>       // For omp_get_max_threads()
+#include <omp.h>
 
 // Helper function to write positions to file for each timestep
 template <typename T>
@@ -27,44 +25,6 @@ void writePositionsToFile(const std::vector<Body<T, 2>> &bodies, int timestep, s
     outFile << "\n";
 }
 
-template <typename T>
-void updateEntropyGrid(const std::vector<Body<T, 2>> &bodies, std::vector<std::vector<int>> &grid,
-                       T minX, T maxX, T minY, T maxY, T invDx, T invDy)
-{
-    int size = grid.size();
-    for (const auto &body : bodies)
-    {
-        auto pos = body.getPosition();
-        int i = static_cast<int>((pos[0] - minX) * invDx);
-        int j = static_cast<int>((pos[1] - minY) * invDy);
-        if (i >= 0 && i < size && j >= 0 && j < size)
-        {
-            grid[i][j]++;
-        }
-    }
-}
-
-double computeNormalizedEntropy(const std::vector<std::vector<int>> &grid, std::size_t totalSamples, double k_B = 1.0)
-{
-    double entropy = 0.0;
-    int numBins = grid.size() * grid[0].size(); // Total number of grid cells
-
-    for (const auto &row : grid)
-    {
-        for (int count : row)
-        {
-            if (count > 0)
-            {
-                double p = static_cast<double>(count) / static_cast<double>(totalSamples);
-                entropy -= p * std::log(p);
-            }
-        }
-    }
-
-    double maxEntropy = std::log(static_cast<double>(numBins));
-    return (maxEntropy > 0) ? (entropy / maxEntropy) * k_B : 0.0;
-}
-
 int main()
 {
     using T = double;
@@ -73,8 +33,7 @@ int main()
     Vector<T, 2> origin({-universeSize / 2, -universeSize / 2});
     Quad<T> universe(origin, universeSize);
 
-    T timeStep = 1e-5;
-    // NBodyBHSolver<T> solver(universe, timeStep);
+    T timeStep = 1e-4;
     SolverType solver(universe, timeStep);
 
     struct PlanetData
@@ -87,27 +46,15 @@ int main()
         T vy;
     };
 
-    // std::vector<PlanetData> planets = {
-    //     {"A", 1.0, -1.0, 0.0, 0.3068934205, 0.1255065670},
-    //     {"B", 1.0, 1.0, 0.0, 0.3068934205, 0.1255065670},
-    //     {"C", 1.0, 0.0, 0.0, -2 * 0.3068934205, -2 * 0.1255065670}};
-
     std::vector<PlanetData> planets;
-    
-    // std::ifstream in("generated_bodies.txt");
-    // std::ifstream in("GeneratedBodies/generated_bodies_500.txt");
-    // std::ifstream in("GeneratedBodies/generated_bodies_1000.txt");
     std::ifstream in("GeneratedBodies/generated_bodies_5000.txt");
-
     if (!in)
     {
         std::cerr << "Failed to open input file" << std::endl;
         return 1;
     }
-    
     double mass, x, y, vx, vy;
     int id = 0;
-
     while (in >> x >> y >> vx >> vy >> mass) {
         PlanetData p;
         p.name = "P" + std::to_string(id++);
@@ -118,11 +65,6 @@ int main()
         p.vy = vy;
         planets.push_back(p);
     }
-
-    // std::vector<PlanetData> planets = {
-    //     {"A", 1.0, -1.0, 0.0, 0.3471168881, 0.5327249454},
-    //     {"B", 1.0, 1.0, 0.0, 0.3471168881, 0.5327249454},
-    //     {"C", 1.0, 0.0, 0.0, -2 * 0.3471168881, -2 * 0.5327249454}};
 
     for (const auto &planet : planets)
     {
@@ -138,57 +80,30 @@ int main()
         return 1;
     }
 
-    std::ofstream entropyFile("../entropy_log_openmp.txt");
-    if (!entropyFile)
-    {
-        std::cerr << "Failed to open entropy file" << std::endl;
-        return 1;
-    }
-    entropyFile << "# Step\tEntropy\n";
-
     const int numParticles = planets.size();
     outFile << "# Format: ParticleID\tX\tY\tE\n";
     outFile << "# Number of particles: " << numParticles << "\n\n";
 
-    // const int numSteps = 1000000;
-    const int numSteps = 10000;  // when test using small number of steps
+    const int numSteps = 100;  // Change as needed
     std::cout << "Starting simulation with " << numParticles << " particles for " << numSteps << " steps\n";
     auto start = std::chrono::high_resolution_clock::now();
 
     solver.calculateEnergy();
     writePositionsToFile(solver.getBodies(), 0, outFile);
 
-    const int gridSize = 1000;
-    std::vector<std::vector<int>> entropyGrid(gridSize, std::vector<int>(gridSize, 0));
-    std::size_t sampleCount = 0;
-
-    T minX = -universeSize / 2;
-    T maxX = universeSize / 2;
-    T minY = -universeSize / 2;
-    T maxY = universeSize / 2;
-    T invDx = gridSize / (maxX - minX);
-    T invDy = gridSize / (maxY - minY);
-
     for (int step = 1; step <= numSteps; ++step)
     {
         solver.simulateOneStep();
 
-        updateEntropyGrid(solver.getBodies(), entropyGrid, minX, maxX, minY, maxY, invDx, invDy);
-        sampleCount += solver.getBodies().size();
-
-        if (step % 1000 == 0)
+        if (step % 1000 == 0 || step == numSteps)
         {
             solver.calculateEnergy();
             writePositionsToFile(solver.getBodies(), step, outFile);
             std::cout << "Completed step " << step << "/" << numSteps << "\n";
-
-            double entropy = computeNormalizedEntropy(entropyGrid, sampleCount);
-            entropyFile << step << "\t" << entropy << "\n";
         }
     }
 
     outFile.close();
-    entropyFile.close();
 
     std::cout << "Simulation complete. Results written to particle_positions_openmp.txt\n";
 
@@ -196,8 +111,8 @@ int main()
     auto end = std::chrono::high_resolution_clock::now();
     double duration = std::chrono::duration<double>(end - start).count();
 
-    int threads = omp_get_max_threads();  // Number of OpenMP threads
-    int body_count = planets.size();
+    int threads = omp_get_max_threads();
+    int body_count = numParticles;
 
     // Append to CSV file
     std::ifstream checkExist("../openmp_runtime_different_threads.csv");
@@ -207,7 +122,7 @@ int main()
     std::ofstream csvFile("../openmp_runtime_different_threads.csv", std::ios::app);
     if (csvFile.is_open()) {
         if (!file_exists) {
-            csvFile << "Bodies,Threads,TimePerStep\n";  // header
+            csvFile << "Bodies,Threads,TimePerStep\n";
         }
         double time_per_step = duration / numSteps;
         csvFile << body_count << "," << threads << "," << time_per_step << "\n";

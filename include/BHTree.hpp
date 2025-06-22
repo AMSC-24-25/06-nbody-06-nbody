@@ -6,12 +6,11 @@
 #include "Quad.hpp"
 #include <memory>
 #include <cmath>
+#include <vector>
 
 const double G = 1;         // Gravitational constant
-// const double THETA = 0.1;   // Barnes-Hut threshold parameter
-// const double EPSILON = 0; // Softening factor for force calculation (not using now for small size bodies)
-const double THETA = 0.5;
-const double EPSILON = 1;
+const double THETA = 0.1;   // Barnes-Hut threshold parameter
+const double EPSILON = 0.0001; // Softening factor
 
 template <typename T>
 class BHTree
@@ -23,110 +22,110 @@ private:
     std::unique_ptr<BHTree> NE;
     std::unique_ptr<BHTree> SW;
     std::unique_ptr<BHTree> SE;
-    bool isExternal; // External nodes are like leaves in the binary tree
+    bool isExternal;
 
-    // Helper method to combine 2 bodies together
+    // Added for depth/leaves control
+    int depth;
+    int maxDepth;
+    int maxLeaves;
+    std::vector<Body<T, 2>> leafBodies;
+
+    // Helper to combine bodies
     static Body<T, 2> combineBodies(const Body<T, 2> &a, const Body<T, 2> &b)
     {
         T totalMass = a.getMass() + b.getMass();
         Vector<T, 2> centerOfMass = (a.getPosition() * a.getMass() + b.getPosition() * b.getMass()) / totalMass;
-
-        // Velocity is weighted average of velocities
         Vector<T, 2> weightedAvgVel = (a.getVelocity() * a.getMass() + b.getVelocity() * b.getMass()) / totalMass;
-
-        Body<T, 2> combined(totalMass, centerOfMass, weightedAvgVel);
-        return combined;
+        return Body<T, 2>(totalMass, centerOfMass, weightedAvgVel);
     }
 
 public:
-    BHTree(const Quad<T> &q) : cluster(0, Vector<T, 2>(), Vector<T, 2>()), quad(q), isExternal(true) {}
+    BHTree(const Quad<T> &q, int depth_ = 0, int maxDepth_ = 6, int maxLeaves_ = 4)
+        : cluster(0, Vector<T, 2>(), Vector<T, 2>()),
+          quad(q), isExternal(true),
+          depth(depth_), maxDepth(maxDepth_), maxLeaves(maxLeaves_)
+    {}
 
-    // Recursive method to insert a body into the tree
     void insert(const Body<T, 2> &b)
     {
-        // If this node has no body, add the body
-        if (isExternal && cluster.getMass() == 0)
-        {
-            cluster = b;
-            return;
-        }
-
-        // If this is an external node (leaf for binary tree), split and rearrange the tree structure
+        // If leaf and not full or at maxDepth, just store in leafBodies
         if (isExternal)
         {
+            if (cluster.getMass() == 0 && leafBodies.empty())
+            {
+                cluster = b;
+                leafBodies.push_back(b);
+                return;
+            }
+            leafBodies.push_back(b);
+
+            if ((int)leafBodies.size() <= maxLeaves || depth >= maxDepth)
+            {
+                // Combine all bodies for this node's cluster
+                cluster = leafBodies[0];
+                for (size_t i = 1; i < leafBodies.size(); ++i)
+                    cluster = combineBodies(cluster, leafBodies[i]);
+                return;
+            }
+
+            // Time to split!
             isExternal = false;
-            Body<T, 2> oldCluster = cluster;
-            cluster = combineBodies(oldCluster, b);
+            NW = std::make_unique<BHTree>(quad.NW(), depth + 1, maxDepth, maxLeaves);
+            NE = std::make_unique<BHTree>(quad.NE(), depth + 1, maxDepth, maxLeaves);
+            SW = std::make_unique<BHTree>(quad.SW(), depth + 1, maxDepth, maxLeaves);
+            SE = std::make_unique<BHTree>(quad.SE(), depth + 1, maxDepth, maxLeaves);
 
-            // Create quadrants if not exists
-            if (!NW)
-                NW = std::make_unique<BHTree>(quad.NW());
-            if (!NE)
-                NE = std::make_unique<BHTree>(quad.NE());
-            if (!SW)
-                SW = std::make_unique<BHTree>(quad.SW());
-            if (!SE)
-                SE = std::make_unique<BHTree>(quad.SE());
-
-            Vector<T, 2> oldPos = oldCluster.getPosition();
-            Vector<T, 2> newPos = b.getPosition();
-
-            // Insert old and new body into appropriate quadrants
-            if (quad.NW().contains(oldPos))
-                NW->insert(oldCluster);
-            else if (quad.NE().contains(oldPos))
-                NE->insert(oldCluster);
-            else if (quad.SW().contains(oldPos))
-                SW->insert(oldCluster);
-            else
-                SE->insert(oldCluster);
-
-            if (quad.NW().contains(newPos))
-                NW->insert(b);
-            else if (quad.NE().contains(newPos))
-                NE->insert(b);
-            else if (quad.SW().contains(newPos))
-                SW->insert(b);
-            else
-                SE->insert(b);
+            // Re-insert all existing bodies into children
+            for (const auto &body : leafBodies)
+            {
+                const Vector<T, 2> &pos = body.getPosition();
+                if (quad.NW().contains(pos))
+                    NW->insert(body);
+                else if (quad.NE().contains(pos))
+                    NE->insert(body);
+                else if (quad.SW().contains(pos))
+                    SW->insert(body);
+                else
+                    SE->insert(body);
+            }
+            leafBodies.clear(); // Not a leaf anymore!
         }
         else
         {
-            // Internal node: multiple childs update center of mass of current cluster and insert b recursively
+            // Internal node: update cluster and recurse
             cluster = combineBodies(cluster, b);
-
-            Vector<T, 2> newPos = b.getPosition();
-
-            if (quad.NW().contains(newPos))
+            const Vector<T, 2> &pos = b.getPosition();
+            if (quad.NW().contains(pos))
                 NW->insert(b);
-            else if (quad.NE().contains(newPos))
+            else if (quad.NE().contains(pos))
                 NE->insert(b);
-            else if (quad.SW().contains(newPos))
+            else if (quad.SW().contains(pos))
                 SW->insert(b);
             else
                 SE->insert(b);
         }
     }
 
-    // Recursive method to update forces acting on a body
     void updateForce(Body<T, 2> &b)
     {
         if (isExternal)
         {
-            // Not adding force to itself or non-existent bodies
-            if (cluster.getMass() > 0 && &cluster != &b)
+            // Add force only from other bodies (not self)
+            for (const auto &other : leafBodies)
             {
-                Vector<T, 2> forceVector = calculateForce(cluster, b);
-                b.updateAcceleration(forceVector / b.getMass());
+                if (other.getMass() > 0 && &other != &b)
+                {
+                    Vector<T, 2> forceVector = calculateForce(other, b);
+                    b.updateAcceleration(forceVector / b.getMass());
+                }
             }
             return;
         }
 
-        // Compute distance from body to cluster's center of mass
         Vector<T, 2> r = cluster.getPosition() - b.getPosition();
         T distance = r.norm();
 
-        // Threshold for Barnes-Hut about if we can treat a cluster as a single body when it is far away
+        // Barnes-Hut opening criterion
         if (quad.getLength() / distance < THETA)
         {
             Vector<T, 2> forceVector = calculateForce(cluster, b);
@@ -134,37 +133,26 @@ public:
         }
         else
         {
-            // Recursively update forces from each subnode if exists
-            if (NW)
-                NW->updateForce(b);
-            if (NE)
-                NE->updateForce(b);
-            if (SW)
-                SW->updateForce(b);
-            if (SE)
-                SE->updateForce(b);
+            if (NW) NW->updateForce(b);
+            if (NE) NE->updateForce(b);
+            if (SW) SW->updateForce(b);
+            if (SE) SE->updateForce(b);
         }
     }
 
-    // Here we should use a gereral force function in the future
-    const Vector<T, 2> calculateForce(Body<T, 2> &cluster, Body<T, 2> &b) const
+    // General force function (Newtonian gravity)
+    Vector<T, 2> calculateForce(const Body<T, 2> &src, const Body<T, 2> &b) const
     {
-        Vector<T, 2> r = cluster.getPosition() - b.getPosition();
+        Vector<T, 2> r = src.getPosition() - b.getPosition();
         T distance = r.norm();
-
-        // Add check for minimum distance to prevent division by zero or instability
         if (distance < 1e-5)
-            distance = 1e-5; // Avoid extremely small distances, maybe there exists a better way
-
-        // Use softened force calculation (now using EPSILON = 0)
+            distance = 1e-5; // Avoid extremely small distances
         T softenedDistance = std::sqrt(distance * distance + EPSILON * EPSILON);
-        T force = (G * b.getMass() * cluster.getMass()) / (softenedDistance * softenedDistance);
-        // Normalize r for direction
+        T force = (G * b.getMass() * src.getMass()) / (softenedDistance * softenedDistance);
         Vector<T, 2> forceVector = r * (force / distance);
         return forceVector;
     }
 
-    // Destroy: std::unique_ptr members automatically handle deletion of their managed objects when the Tree object is destroyed.
     ~BHTree() = default;
 };
 

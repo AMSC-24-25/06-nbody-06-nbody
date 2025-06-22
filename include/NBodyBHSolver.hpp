@@ -110,47 +110,15 @@ public:
             body.updateVelocity(deltaVel);
         }
 
-        // Handle collisions
-        for (size_t i = 0; i < bodies.size(); ++i)
-        {
-            for (size_t j = i + 1; j < bodies.size(); ++j)
-            {
-                CollisionHandler<T>::handleCollision(bodies[i], bodies[j], timeStep);
-            }
-        }
+        // // Handle collisions
+        // for (size_t i = 0; i < bodies.size(); ++i)
+        // {
+        //     for (size_t j = i + 1; j < bodies.size(); ++j)
+        //     {
+        //         CollisionHandler<T>::handleCollision(bodies[i], bodies[j], timeStep);
+        //     }
+        // }
     }
-
-    // Forwards Euler For Comparison
-    // void simulateOneStepEu()
-    // {
-    //     // First force calculation
-    //     BHTree<T> tree1(universe);
-    //     for (Body<T, 2> &body : bodies)
-    //     {
-    //         if (universe.contains(body.getPosition()))
-    //         {
-    //             tree1.insert(body);
-    //         }
-    //     }
-    //     // Reset and calculate initial accelerations
-    //     for (Body<T, 2> &body : bodies)
-    //     {
-    //         body.setAcceleration(Vector<T, 2>());
-    //         tree1.updateForce(body);
-    //     }
-    //     // Position
-    //     for (Body<T, 2> &body : bodies)
-    //     {
-    //         Vector<T, 2> deltaPos = body.getVelocity() * timeStep;
-    //         body.updatePosition(deltaPos);
-    //     }
-    //     // Velocity
-    //     for (Body<T, 2> &body : bodies)
-    //     {
-    //         Vector<T, 2> deltaVel = body.getAcceleration() * timeStep;
-    //         body.updateVelocity(deltaVel);
-    //     }
-    // }
 };
 
 #endif // NBODYBHSOLVER_HPP_

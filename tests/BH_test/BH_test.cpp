@@ -5,9 +5,9 @@
 #include "NBodyBHSolver.hpp"
 #include <iostream>
 #include <fstream>
-#include <random>
 #include <string>
 #include <vector>
+#include <cmath>
 
 // Helper function to write positions to file for each timestep
 template <typename T>
@@ -43,8 +43,7 @@ void updateEntropyGrid(const std::vector<Body<T, 2>> &bodies, std::vector<std::v
 double computeNormalizedEntropy(const std::vector<std::vector<int>> &grid, std::size_t totalSamples, double k_B = 1.0)
 {
     double entropy = 0.0;
-    int numBins = grid.size() * grid[0].size(); // Total number of grid cells
-
+    int numBins = grid.size() * grid[0].size();
     for (const auto &row : grid)
     {
         for (int count : row)
@@ -56,7 +55,6 @@ double computeNormalizedEntropy(const std::vector<std::vector<int>> &grid, std::
             }
         }
     }
-
     double maxEntropy = std::log(static_cast<double>(numBins));
     return (maxEntropy > 0) ? (entropy / maxEntropy) * k_B : 0.0;
 }
@@ -82,30 +80,10 @@ int main()
         T vy;
     };
 
-    // std::vector<PlanetData> planets = {
-    //     {"A", 1.0, -1.0, 0.0, 0.3068934205, 0.1255065670},
-    //     {"B", 1.0, 1.0, 0.0, 0.3068934205, 0.1255065670},
-    //     {"C", 1.0, 0.0, 0.0, -2 * 0.3068934205, -2 * 0.1255065670}};
-    std::vector<PlanetData> planets;
-    std::ifstream in("generated_bodies.txt");
-    double mass, x, y, vx, vy;
-    int id = 0;
-
-    while (in >> x >> y >> vx >> vy >> mass) {
-        PlanetData p;
-        p.name = "P" + std::to_string(id++);
-        p.mass = mass;
-        p.x = x;
-        p.y = y;
-        p.vx = vx;
-        p.vy = vy;
-        planets.push_back(p);
-    }
-
-    // std::vector<PlanetData> planets = {
-    //     {"A", 1.0, -1.0, 0.0, 0.3471168881, 0.5327249454},
-    //     {"B", 1.0, 1.0, 0.0, 0.3471168881, 0.5327249454},
-    //     {"C", 1.0, 0.0, 0.0, -2 * 0.3471168881, -2 * 0.5327249454}};
+    std::vector<PlanetData> planets = {
+        {"A", 1.0, -1.0, 0.0, 0.3068934205, 0.1255065670},
+        {"B", 1.0, 1.0, 0.0, 0.3068934205, 0.1255065670},
+        {"C", 1.0, 0.0, 0.0, -2 * 0.3068934205, -2 * 0.1255065670}};
 
     for (const auto &planet : planets)
     {
@@ -133,8 +111,7 @@ int main()
     outFile << "# Format: ParticleID\tX\tY\tE\n";
     outFile << "# Number of particles: " << numParticles << "\n\n";
 
-    const int numSteps = 1000000;
-    // const int numSteps = 10000;  // use small number to test
+    const int numSteps = 800000;
 
     std::cout << "Starting simulation with " << numParticles << " particles for " << numSteps << " steps\n";
 
@@ -159,7 +136,7 @@ int main()
         updateEntropyGrid(solver.getBodies(), entropyGrid, minX, maxX, minY, maxY, invDx, invDy);
         sampleCount += solver.getBodies().size();
 
-        if (step % 1000 == 0)
+        if (step % 2000 == 0)
         {
             solver.calculateEnergy();
             writePositionsToFile(solver.getBodies(), step, outFile);
