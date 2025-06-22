@@ -16,7 +16,7 @@ with open(filename) as f:
         entropy.append(float(e))
 
 plt.plot(steps, entropy, label="Shannon Entropy")
-plt.xlabel("Simulation Step")
+plt.xlabel("Simulation Step (with 1e-5 s per step)")
 plt.ylabel("Entropy")
 plt.title("Entropy Evolution in 3-Body Simulation")
 plt.grid(True)
