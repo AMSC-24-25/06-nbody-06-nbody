@@ -61,7 +61,7 @@ Drag to orbit the camera around the origin, and scroll to zoom. Pressing `o` tog
 |:--------:|:-------:|
 | Execution time of a single step for θ=0.75 | Scalability for different values of θ (log-log) |
 
-Detailed information can be found in Section 3.1 of the ![report](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/AMSC_Project_Report___Group_6.pdf).
+Detailed information can be found in Section 3.1 of the [report](https://github.com/AMSC-24-25/06-nbody-06-nbody/blob/main/AMSC_Project_Report___Group_6.pdf).
 
 
 ### 2,097,152 particles at ~150ms per step (θ=0.6)
