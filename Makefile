@@ -20,7 +20,7 @@ CUDA_ARCHS ?= 89
 
 NVCC_GENCODE := $(foreach arch,$(CUDA_ARCHS),-gencode arch=compute_$(arch),code=sm_$(arch))
 NVCC_PTX := -gencode arch=compute_$(lastword $(CUDA_ARCHS)),code=compute_$(lastword $(CUDA_ARCHS))
-NVCCFLAGS := $(NVCC_GENCODE) $(NVCC_PTX) -maxrregcount=40 -lineinfo
+NVCCFLAGS := $(NVCC_GENCODE) $(NVCC_PTX) -maxrregcount=40
 
 EXE = main
 CUDA_OBJS = points.o btree.o octree.o physics_common.o barnes_hut.o simulation.o validator.o
