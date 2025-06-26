@@ -12,6 +12,7 @@
 #include "local_expansion.hpp"
 #include "fmm_fields.hpp"
 
+//avoid name conflicts
 namespace fmm
 {
 
@@ -36,7 +37,7 @@ namespace fmm
             : sources(sources), eps(eps), force_smoothing_eps(force_smoothing_eps)
         {
             static_assert(d == 2, "Only 2D FMM is implemented.");
-            // Determine expansion order
+            // Determine expansion order p = log(A/eps)/log(2)
             double A = std::accumulate(sources.begin(), sources.end(), 0.0,
                                        [](double acc, const Body &src)
                                        { return acc + std::abs(src.sourceStrength()); });

@@ -78,3 +78,11 @@ We can generate uniform distribution of bodies in a 2D square space with all the
 ![The Enrgy Evolution](tests/Integration/energy_vs_time.png)
 
 - More detailed tests like accuracy and efficiency can be found in the `Performance` folder.
+
+- Some codes related to the complex background math part is referring to these projects and files
+
+- [FMM Math Summary] (<https://github.com/jrotheneder/Mathnotes>)
+
+- [FMM Overview] (<https://www.academia.edu/2789162/A_short_course_on_fast_multipole_methods>)
+
+- [FMM Implementation] (<https://github.com/jrotheneder/FMM>)

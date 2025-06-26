@@ -49,12 +49,12 @@ namespace fmm
         {
             Body &src = sources[i];
             Complex z{src.position[0], src.position[1]};
-            Complex z_rel = z - this->center; // Express z in box-local coordinates
+            Complex z_rel = z - this->center; // Express z in box-local coordinates, // (z_i - z0)
             Complex z_rel_pow = z_rel;
-            (*this)(0) += src.sourceStrength();
+            (*this)(0) += src.sourceStrength(); // a_0 = sum q_i
             for (unsigned j = 1; j <= order; ++j)
             {
-                (*this)(j) -= src.sourceStrength() * z_rel_pow;
+                (*this)(j) -= src.sourceStrength() * z_rel_pow; // -q_i (z_i-z0)^j
                 z_rel_pow *= z_rel;
             }
         }
